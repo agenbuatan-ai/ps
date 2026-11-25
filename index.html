@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Daftar Pasien — Neumorphism</title>
+<style>
+  /* ================= RESET & VARIABEL ================= */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    /* Palet neumorphism */
+    --bg: #e4e8ee;
+    --bg-deep: #dde2e9;
+    --text: #3d4a5c;
+    --muted: #8b97a8;
+    --line: transparent;
+
+    /* Aksen */
+    --tosca: #14b8a6;
+    --tosca-deep: #0d9488;
+    --tosca-soft: #cfeeea;
+    --purple: #8b5cf6;
+    --purple-deep: #7c3aed;
+    --purple-soft: #e2dbfb;
+
+    /* Bayangan neumorphism */
+    --sh-raise: 7px 7px 15px #c3c9d2, -7px -7px 15px #ffffff;
+    --sh-raise-sm: 4px 4px 9px #c3c9d2, -4px -4px 9px #ffffff;
+    --sh-hover: 9px 9px 18px #bfc6d0, -9px -9px 18px #ffffff;
+    --sh-inset: inset 5px 5px 10px #c3c9d2, inset -5px -5px 10px #ffffff;
+    --sh-inset-sm: inset 3px 3px 6px #c3c9d2, inset -3px -3px 6px #ffffff;
+
+    /* Bayangan berwarna (aksen) */
+    --sh-tosca: 5px 5px 12px #b8d6d1, -5px -5px 12px #ffffff;
+    --sh-purple: 5px 5px 12px #c9c1e8, -5px -5px 12px #ffffff;
+
+    --radius: 20px;
+    --radius-sm: 14px;
+  }
+
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ================= LAYOUT ================= */
+  .layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: 100vh;
+    gap: 0;
+  }
+
+  /* ================= SIDEBAR ================= */
+  .sidebar {
+    background: var(--bg);
+    padding: 26px 18px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    box-shadow: 8px 0 20px -12px rgba(163, 172, 186, .55);
+    z-index: 5;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 0 6px;
+  }
+
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--bg);
+    box-shadow: var(--sh-raise-sm);
+    display: grid;
+    place-items: center;
+    color: var(--tosca-deep);
+    font-weight: 800;
+    font-size: 19px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .brand-logo::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 10px;
+    box-shadow: var(--sh-inset-sm);
+    opacity: .45;
+    pointer-events: none;
+  }
+
+  .brand-text strong {
+    display: block;
+    font-size: 15px;
+    letter-spacing: .2px;
+    color: var(--text);
+  }
+
+  .brand-text span {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .nav-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    padding: 0 12px;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  .nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: box-shadow .22s, color .22s, transform .15s;
+  }
+
+  .nav a:hover {
+    box-shadow: var(--sh-raise-sm);
+    color: var(--text);
+  }
+
+  .nav a:active {
+    box-shadow: var(--sh-inset-sm);
+  }
+
+  .nav a.active {
+    color: var(--purple-deep);
+    box-shadow: var(--sh-inset);
+  }
+
+  .nav a.active .ico {
+    color: var(--purple-deep);
+  }
+
+  .nav .ico {
+    font-size: 16px;
+    width: 18px;
+    text-align: center;
+    color: var(--muted);
+    transition: color .22s;
+  }
+
+  .nav a:hover .ico {
+    color: var(--tosca-deep);
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    font-size: 11.5px;
+    color: var(--muted);
+    padding: 14px 12px;
+    line-height: 1.6;
+    border-radius: 14px;
+    box-shadow: var(--sh-inset-sm);
+    text-align: center;
+  }
+
+  /* ================= MAIN ================= */
+  .main {
+    padding: 32px 36px 48px;
+    min-width: 0;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+
+  .topbar h1 {
+    font-size: 23px;
+    letter-spacing: -.3px;
+    color: var(--text);
+  }
+
+  .topbar p {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--bg);
+    padding: 9px 18px 9px 9px;
+    border-radius: 999px;
+    box-shadow: var(--sh-raise-sm);
+  }
+
+  .user-chip .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: var(--sh-inset-sm);
+    color: var(--purple-deep);
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .user-chip .who strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .user-chip .who span {
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  /* ================= STAT CARDS ================= */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+    gap: 22px;
+    margin-bottom: 30px;
+  }
+
+  .stat {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    box-shadow: var(--sh-raise);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    transition: box-shadow .25s, transform .25s;
+  }
+
+  .stat:hover {
+    box-shadow: var(--sh-hover);
+    transform: translateY(-2px);
+  }
+
+  .stat .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: var(--bg);
+    box-shadow: var(--sh-inset-sm);
+  }
+
+  .stat .icon.blue   { color: var(--tosca-deep); }
+  .stat .icon.green  { color: var(--tosca-deep); }
+  .stat .icon.amber  { color: var(--purple-deep); }
+  .stat .icon.purple { color: var(--purple-deep); }
+
+  .stat .val {
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat .lbl {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  /* ================= CARD / TABEL ================= */
+  .card {
+    background: var(--bg);
+    border-radius: 26px;
+    box-shadow: var(--sh-raise);
+    padding: 8px;
+    overflow: hidden;
+  }
+
+  .card-head {
+    padding: 22px 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .card-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .card-head h2 {
+    font-size: 16.5px;
+    letter-spacing: -.2px;
+    color: var(--text);
+  }
+
+  .card-head .sub {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search {
+    position: relative;
+    flex: 1 1 230px;
+    min-width: 180px;
+  }
+
+  .search input {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    border: none;
+    border-radius: 14px;
+    background: var(--bg);
+    box-shadow: var(--sh-inset-sm);
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: box-shadow .22s;
+  }
+
+  .search input::placeholder {
+    color: var(--muted);
+  }
+
+  .search input:focus {
+    box-shadow: var(--sh-inset);
+  }
+
+  .search::before {
+    content: "🔍";
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    opacity: .55;
+    pointer-events: none;
+  }
+
+  select.filter {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 14px;
+    background: var(--bg);
+    box-shadow: var(--sh-raise-sm);
+    font-size: 13.5px;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+    transition: box-shadow .22s;
+  }
+
+  select.filter:focus,
+  select.filter:hover {
+    box-shadow: var(--sh-raise);
+  }
+
+  /* Tombol */
+  .btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 14px;
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: box-shadow .22s, color .22s, transform .12s;
+    background: var(--bg);
+  }
+
+  .btn-primary {
+    color: var(--tosca-deep);
+    box-shadow: var(--sh-tosca);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 8px 8px 18px #adcfc9, -8px -8px 18px #ffffff;
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    box-shadow: var(--sh-inset-sm);
+    transform: translateY(0);
+  }
+
+  /* Progress */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 14px;
+    background: var(--bg);
+    border-radius: 999px;
+    box-shadow: var(--sh-inset-sm);
+    padding: 3px;
+    min-width: 120px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--tosca), var(--purple));
+    box-shadow: 0 0 8px rgba(139, 92, 246, .35);
+    transition: width .4s cubic-bezier(.4, 0, .2, 1);
+  }
+
+  .progress-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  /* Tabel */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 20px;
+    padding: 4px 8px 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    min-width: 840px;
+  }
+
+  thead th {
+    text-align: left;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    font-weight: 800;
+    padding: 6px 18px 12px;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 15px 18px;
+    font-size: 13.5px;
+    background: var(--bg);
+    vertical-align: middle;
+    transition: background .25s, box-shadow .25s;
+  }
+
+  /* Sudut membulat per baris */
+  tbody tr td:first-child {
+    border-radius: 16px 0 0 16px;
+    padding-left: 20px;
+  }
+
+  tbody tr td:last-child {
+    border-radius: 0 16px 16px 0;
+    padding-right: 20px;
+  }
+
+  tbody tr {
+    transition: transform .18s;
+  }
+
+  tbody tr:hover td {
+    box-shadow: inset 0 1px 0 #ffffff, inset 0 -1px 0 #c9cfd8;
+  }
+
+  /* ================= CHECKBOX NEUMORPHISM ================= */
+  .check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 9px;
+    background: var(--bg);
+    box-shadow: var(--sh-raise-sm);
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    transition: box-shadow .22s, transform .12s;
+  }
+
+  .check:hover {
+    box-shadow: var(--sh-raise);
+  }
+
+  .check:active {
+    transform: scale(.92);
+  }
+
+  .check:checked {
+    box-shadow: var(--sh-inset);
+    background: linear-gradient(135deg, rgba(20, 184, 166, .14), rgba(139, 92, 246, .14));
+  }
+
+  .check:checked::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid var(--tosca-deep);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+    filter: drop-shadow(1px 1px 1px rgba(255, 255, 255, .9));
+  }
+
+  .check:focus-visible {
+    outline: 3px solid rgba(139, 92, 246, .3);
+    outline-offset: 3px;
+  }
+
+  /* ================= BARIS SUDAH DICEK ================= */
+  tbody tr:has(.check:checked) td {
+    background: linear-gradient(135deg, #dfe9e7, #e2dfef);
+    box-shadow: var(--sh-inset-sm);
+  }
+
+  tbody tr:has(.check:checked) .nama-pasien {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  tbody tr:has(.check:checked) .avatar-sm {
+    opacity: .6;
+    filter: grayscale(.6);
+  }
+
+  /* ================= BADGE STATUS ================= */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 800;
+    white-space: nowrap;
+    background: var(--bg);
+    box-shadow: var(--sh-raise-sm);
+  }
+
+  .badge::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  .badge.wait   { color: var(--purple-deep); }
+  .badge.done   { color: var(--tosca-deep); }
+  .badge.proses { color: var(--purple-deep); }
+
+  /* Ganti status otomatis saat checkbox dicentang */
+  .status-done { display: none; }
+  tbody tr:has(.check:checked) .status-wait { display: none; }
+  tbody tr:has(.check:checked) .status-done {
+    display: inline-flex;
+    box-shadow: var(--sh-inset-sm);
+  }
+
+  /* ================= SEL PASIEN ================= */
+  .pasien {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .avatar-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+    background: var(--bg);
+    box-shadow: var(--sh-inset-sm);
+    transition: opacity .25s, filter .25s;
+  }
+
+  .a1 { color: var(--tosca-deep); }
+  .a2 { color: var(--purple-deep); }
+  .a3 { color: var(--tosca-deep); }
+  .a4 { color: var(--purple-deep); }
+  .a5 { color: var(--tosca-deep); }
+  .a6 { color: var(--purple-deep); }
+
+  .nama-pasien {
+    font-weight: 700;
+    color: var(--text);
+    transition: color .25s;
+  }
+
+  .rm {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 3px;
+    font-weight: 600;
+  }
+
+  .poli {
+    display: inline-block;
+    padding: 6px 13px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--bg);
+    box-shadow: var(--sh-raise-sm);
+  }
+
+  .jam {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .aksi {
+    background: var(--bg);
+    border: none;
+    border-radius: 10px;
+    padding: 8px 15px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    box-shadow: var(--sh-raise-sm);
+    transition: box-shadow .22s, color .22s;
+  }
+
+  .aksi:hover {
+    color: var(--purple-deep);
+    box-shadow: var(--sh-raise);
+  }
+
+  .aksi:active {
+    box-shadow: var(--sh-inset-sm);
+  }
+
+  /* ================= RESPONSIF ================= */
+  @media (max-width: 1024px) {
+    .layout { grid-template-columns: 84px 1fr; }
+    .brand-text, .nav-label, .nav a span.txt, .sidebar-footer { display: none; }
+    .nav a { justify-content: center; padding: 13px; }
+    .brand { justify-content: center; padding: 0; }
+    .main { padding: 26px 22px 40px; }
+  }
+
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar {
+      position: static;
+      height: auto;
+      flex-direction: row;
+      align-items: center;
+      padding: 14px 16px;
+      gap: 12px;
+      overflow-x: auto;
+      box-shadow: 0 8px 20px -12px rgba(163, 172, 186, .7);
+    }
+    .nav { flex-direction: row; gap: 8px; }
+    .main { padding: 22px 16px 36px; }
+    .topbar h1 { font-size: 19px; }
+    .card-head { padding: 18px 16px; }
+    .stats { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">K</div>
+      <div class="brand-text">
+        <strong>Klinik Sehat</strong>
+        <span>Panel Admin</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <span class="nav-label">Menu Utama</span>
+      <a href="#" class="active"><span class="ico">▦</span><span class="txt">Dashboard</span></a>
+      <a href="#"><span class="ico">👤</span><span class="txt">Pasien</span></a>
+      <a href="#"><span class="ico">🗓</span><span class="txt">Jadwal</span></a>
+      <a href="#"><span class="ico">📋</span><span class="txt">Rekam Medis</span></a>
+      <a href="#"><span class="ico">📊</span><span class="txt">Laporan</span></a>
+      <a href="#"><span class="ico">⚙</span><span class="txt">Pengaturan</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      v1.0.0 &middot; Sistem Antrian Pasien
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div>
+        <h1>Daftar Pasien Hari Ini</h1>
+        <p>Senin, 24 November 2025 &middot; 08.00 – 12.00 WIB</p>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">AD</div>
+        <div class="who">
+          <strong>Admin Klinik</strong>
+          <span>Front Office</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Statistik -->
+    <section class="stats">
+      <div class="stat">
+        <div class="icon blue">👥</div>
+        <div>
+          <div class="val">8</div>
+          <div class="lbl">Total Pasien</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="icon green">✅</div>
+        <div>
+          <div class="val" id="statDone">0</div>
+          <div class="lbl">Sudah Dicek</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="icon amber">⏳</div>
+        <div>
+          <div class="val" id="statWait">8</div>
+          <div class="lbl">Belum Dicek</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="icon purple">🩺</div>
+        <div>
+          <div class="val">5</div>
+          <div class="lbl">Poli Aktif</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kartu Tabel -->
+    <section class="card">
+
+      <div class="card-head">
+        <div class="card-head-row">
+          <div>
+            <h2>Antrian Pasien</h2>
+            <div class="sub">Centang kotak di samping untuk menandai pasien sudah diperiksa.</div>
+          </div>
+          <button class="btn btn-primary">+ Tambah Pasien</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="search">
+            <input type="text" id="searchInput" placeholder="Cari nama pasien atau No. RM...">
+          </div>
+          <select class="filter">
+            <option>Semua Poli</option>
+            <option>Poli Umum</option>
+            <option>Poli Gigi</option>
+            <option>Poli Jantung</option>
+            <option>Poli Anak</option>
+            <option>Poli Mata</option>
+          </select>
+          <select class="filter" id="filterStatus">
+            <option value="all">Semua Status</option>
+            <option value="wait">Belum Dicek</option>
+            <option value="done">Sudah Dicek</option>
+          </select>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <span class="progress-text" id="progressText">0 dari 8 pasien sudah dicek</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:56px;">
+                <input type="checkbox" class="check" id="checkAll" title="Centang semua">
+              </th>
+              <th>Pasien</th>
+              <th>Usia / JK</th>
+              <th>Poli</th>
+              <th>Jam</th>
+              <th>Status</th>
+              <th style="width:104px;">Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody id="tableBody">
+
+            <tr>
+              <td><input type="checkbox" class="check row-check"></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a1">BS</div>
+                  <div>
+                    <div class="nama-pasien">Budi Santoso</div>
+                    <div class="rm">RM-2025-001</div>
+                  </div>
+                </div>
+              </td>
+              <td>45 Th &middot; L</td>
+              <td><span class="poli">Poli Umum</span></td>
+              <td><span class="jam">08:00</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="check row-check" checked></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a2">SA</div>
+                  <div>
+                    <div class="nama-pasien">Siti Aminah</div>
+                    <div class="rm">RM-2025-002</div>
+                  </div>
+                </div>
+              </td>
+              <td>32 Th &middot; P</td>
+              <td><span class="poli">Poli Gigi</span></td>
+              <td><span class="jam">08:30</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="check row-check"></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a3">AW</div>
+                  <div>
+                    <div class="nama-pasien">Agus Wijaya</div>
+                    <div class="rm">RM-2025-003</div>
+                  </div>
+                </div>
+              </td>
+              <td>58 Th &middot; L</td>
+              <td><span class="poli">Poli Jantung</span></td>
+              <td><span class="jam">09:00</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="check row-check" checked></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a4">DL</div>
+                  <div>
+                    <div class="nama-pasien">Dewi Lestari</div>
+                    <div class="rm">RM-2025-004</div>
+                  </div>
+                </div>
+              </td>
+              <td>27 Th &middot; P</td>
+              <td><span class="poli">Poli Anak</span></td>
+              <td><span class="jam">09:15</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="check row-check"></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a5">RH</div>
+                  <div>
+                    <div class="nama-pasien">Rudi Hartono</div>
+                    <div class="rm">RM-2025-005</div>
+                  </div>
+                </div>
+              </td>
+              <td>39 Th &middot; L</td>
+              <td><span class="poli">Poli Umum</span></td>
+              <td><span class="jam">09:45</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="check row-check"></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a6">NA</div>
+                  <div>
+                    <div class="nama-pasien">Nur Aisyah</div>
+                    <div class="rm">RM-2025-006</div>
+                  </div>
+                </div>
+              </td>
+              <td>51 Th &middot; P</td>
+              <td><span class="poli">Poli Mata</span></td>
+              <td><span class="jam">10:00</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="check row-check"></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a1">JS</div>
+                  <div>
+                    <div class="nama-pasien">Joko Susilo</div>
+                    <div class="rm">RM-2025-007</div>
+                  </div>
+                </div>
+              </td>
+              <td>63 Th &middot; L</td>
+              <td><span class="poli">Poli Jantung</span></td>
+              <td><span class="jam">10:30</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+            <tr>
+              <td><input type="checkbox" class="check row-check"></td>
+              <td>
+                <div class="pasien">
+                  <div class="avatar-sm a2">MP</div>
+                  <div>
+                    <div class="nama-pasien">Maya Putri</div>
+                    <div class="rm">RM-2025-008</div>
+                  </div>
+                </div>
+              </td>
+              <td>22 Th &middot; P</td>
+              <td><span class="poli">Poli Kulit</span></td>
+              <td><span class="jam">11:00</span></td>
+              <td>
+                <span class="badge wait status-wait">Menunggu</span>
+                <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td><button class="aksi">Detail</button></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  /* ====== Logika checklist: progress, statistik, & centang semua ====== */
+  const rowChecks = document.querySelectorAll('.row-check');
+  const checkAll  = document.getElementById('checkAll');
+  const fill      = document.getElementById('progressFill');
+  const text      = document.getElementById('progressText');
+  const statDone  = document.getElementById('statDone');
+  const statWait  = document.getElementById('statWait');
+
+  function updateProgress() {
+    const total = rowChecks.length;
+    const done  = [...rowChecks].filter(c => c.checked).length;
+
+    fill.style.width = (done / total * 100) + '%';
+    text.textContent = `${done} dari ${total} pasien sudah dicek`;
+    statDone.textContent = done;
+    statWait.textContent = total - done;
+
+    checkAll.checked       = done === total && total > 0;
+    checkAll.indeterminate = done > 0 && done < total;
+  }
+
+  rowChecks.forEach(c => c.addEventListener('change', updateProgress));
+
+  checkAll.addEventListener('change', () => {
+    rowChecks.forEach(c => c.checked = checkAll.checked);
+    updateProgress();
+  });
+
+  updateProgress();
+</script>
+
+</body>
+</html>
