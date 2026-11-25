@@ -26,7 +26,6 @@
     --sh-tosca: 5px 5px 12px #b8d6d1, -5px -5px 12px #ffffff;
 
     --radius: 20px;
-    --radius-sm: 14px;
   }
 
   body {
@@ -35,17 +34,19 @@
     color: var(--text);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* ================= LAYOUT ================= */
+  /* ================= LAYOUT (FLEX agar sidebar bisa di-hide halus) ================= */
   .layout {
-    display: grid;
-    grid-template-columns: 250px 1fr;
+    display: flex;
     min-height: 100vh;
   }
 
   /* ================= SIDEBAR ================= */
   .sidebar {
+    width: 250px;
+    flex-shrink: 0;
     background: var(--bg);
     padding: 26px 18px;
     position: sticky;
@@ -56,6 +57,15 @@
     gap: 26px;
     box-shadow: 8px 0 20px -12px rgba(163, 172, 186, .55);
     z-index: 5;
+    overflow-y: auto;
+    transition: margin-left .35s cubic-bezier(.4, 0, .2, 1), opacity .3s ease;
+  }
+
+  /* --- State sidebar disembunyikan --- */
+  body.sidebar-hidden .sidebar {
+    margin-left: -250px;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .brand { display: flex; align-items: center; gap: 13px; padding: 0 6px; }
@@ -103,14 +113,32 @@
   }
 
   /* ================= MAIN ================= */
-  .main { padding: 32px 36px 48px; min-width: 0; }
+  .main { flex: 1; min-width: 0; padding: 32px 36px 48px; }
 
+  /* --- Topbar dengan tombol toggle --- */
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
     gap: 18px; flex-wrap: wrap; margin-bottom: 30px;
   }
+  .topbar-left {
+    display: flex; align-items: center; gap: 16px;
+  }
   .topbar h1 { font-size: 23px; letter-spacing: -.3px; color: var(--text); }
   .topbar p { font-size: 13.5px; color: var(--muted); margin-top: 5px; }
+
+  .menu-toggle {
+    width: 48px; height: 48px;
+    border: none; border-radius: 14px;
+    background: var(--bg);
+    box-shadow: var(--sh-raise-sm);
+    cursor: pointer;
+    color: var(--text);
+    display: grid; place-items: center;
+    transition: box-shadow .22s, color .22s, transform .12s;
+    flex-shrink: 0;
+  }
+  .menu-toggle:hover { box-shadow: var(--sh-raise); color: var(--purple-deep); }
+  .menu-toggle:active { box-shadow: var(--sh-inset-sm); transform: scale(.94); }
 
   .user-chip {
     display: flex; align-items: center; gap: 11px;
@@ -215,7 +243,7 @@
 
   table {
     width: 100%; border-collapse: separate;
-    border-spacing: 0 10px; min-width: 1180px;
+    border-spacing: 0 10px; min-width: 1280px;
   }
 
   thead th {
@@ -255,7 +283,7 @@
   .badge-kat.tosca  { color: var(--tosca-deep); }
   .badge-kat.purple { color: var(--purple-deep); }
 
-  /* ================= CHECKBOX NEUMORPHISM ================= */
+  /* ================= CHECKBOX ================= */
   .check {
     appearance: none; -webkit-appearance: none;
     width: 26px; height: 26px; border: none; border-radius: 9px;
@@ -277,6 +305,21 @@
     filter: drop-shadow(1px 1px 1px rgba(255, 255, 255, .9));
   }
   .check:focus-visible { outline: 3px solid rgba(139, 92, 246, .3); outline-offset: 3px; }
+
+  /* --- Tombol Edit --- */
+  .btn-edit {
+    width: 38px; height: 38px;
+    border: none; border-radius: 10px;
+    background: var(--bg);
+    box-shadow: var(--sh-raise-sm);
+    cursor: pointer;
+    color: var(--purple-deep);
+    display: inline-grid; place-items: center;
+    transition: box-shadow .22s, color .22s, transform .12s;
+  }
+  .btn-edit:hover { box-shadow: var(--sh-raise); color: var(--tosca-deep); }
+  .btn-edit:active { box-shadow: var(--sh-inset-sm); transform: scale(.9); }
+  .btn-edit svg { display: block; }
 
   /* ================= BARIS SUDAH DICEK ================= */
   tbody tr:has(.check:checked) td {
@@ -327,31 +370,151 @@
   .nama-pasien { font-weight: 700; color: var(--text); transition: color .25s; font-size: 13px; }
   .rm { font-size: 11.5px; color: var(--muted); margin-top: 3px; font-weight: 600; }
 
-  /* Baris tersembunyi oleh filter */
   tr.filtered-out { display: none !important; }
+
+  /* ================= MODAL EDIT ================= */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(180, 190, 205, .5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+  .modal-card {
+    background: var(--bg);
+    border-radius: 22px;
+    box-shadow: 14px 14px 32px #c3c9d2, -14px -14px 32px #ffffff;
+    padding: 26px 28px;
+    width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto;
+    animation: popIn .28s cubic-bezier(.4, 0, .2, 1);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(.95) translateY(12px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .modal-head h3 {
+    font-size: 18px; color: var(--text); letter-spacing: -.2px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .modal-head h3::before {
+    content: "✎";
+    width: 34px; height: 34px; border-radius: 10px;
+    background: var(--bg); box-shadow: var(--sh-inset-sm);
+    display: grid; place-items: center;
+    color: var(--purple-deep); font-size: 15px;
+  }
+  .modal-close {
+    width: 38px; height: 38px; border: none; border-radius: 11px;
+    background: var(--bg); box-shadow: var(--sh-raise-sm);
+    cursor: pointer; color: var(--muted); font-size: 22px; line-height: 1;
+    transition: box-shadow .2s, color .2s, transform .1s;
+  }
+  .modal-close:hover { box-shadow: var(--sh-raise); color: var(--text); }
+  .modal-close:active { box-shadow: var(--sh-inset-sm); transform: scale(.92); }
+
+  .modal-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .modal-form label {
+    display: flex; flex-direction: column; gap: 7px;
+    font-size: 11px; font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase; letter-spacing: .6px;
+  }
+
+  .modal-form input,
+  .modal-form select {
+    width: 100%;
+    padding: 11px 14px;
+    border: none; border-radius: 11px;
+    background: var(--bg);
+    box-shadow: var(--sh-inset-sm);
+    font-family: inherit; font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: box-shadow .2s;
+  }
+  .modal-form input:focus,
+  .modal-form select:focus { box-shadow: var(--sh-inset); }
+
+  .modal-actions {
+    display: flex; gap: 12px; justify-content: flex-end;
+    margin-top: 10px;
+  }
+  .btn-cancel {
+    color: var(--muted);
+    box-shadow: var(--sh-raise-sm);
+  }
+  .btn-cancel:hover { color: var(--text); box-shadow: var(--sh-raise); }
+
+  /* ================= TOAST ================= */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: var(--bg);
+    box-shadow: var(--sh-raise);
+    color: var(--tosca-deep);
+    padding: 14px 24px;
+    border-radius: 14px;
+    font-weight: 800; font-size: 13.5px;
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0;
+    transition: opacity .3s ease, transform .3s cubic-bezier(.4, 0, .2, 1);
+    z-index: 200;
+    pointer-events: none;
+  }
+  .toast::before { content: "✓"; font-size: 15px; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* ================= RESPONSIF ================= */
   @media (max-width: 1024px) {
-    .layout { grid-template-columns: 84px 1fr; }
+    .sidebar { width: 84px; padding: 26px 14px; }
+    body.sidebar-hidden .sidebar { margin-left: -84px; }
     .brand-text, .nav-label, .nav a span.txt, .sidebar-footer { display: none; }
     .nav a { justify-content: center; padding: 13px; }
     .brand { justify-content: center; padding: 0; }
     .main { padding: 26px 22px 40px; }
+    .form-row { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 720px) {
-    .layout { grid-template-columns: 1fr; }
+    .layout { flex-direction: column; }
     .sidebar {
-      position: static; height: auto; flex-direction: row;
-      align-items: center; padding: 14px 16px; gap: 12px;
+      width: 100%;
+      height: auto;
+      position: static;
+      flex-direction: row;
+      align-items: center;
+      padding: 14px 16px;
+      gap: 12px;
       overflow-x: auto;
+      overflow-y: visible;
       box-shadow: 0 8px 20px -12px rgba(163, 172, 186, .7);
+    }
+    body.sidebar-hidden .sidebar {
+      display: none;
+      margin-left: 0;
     }
     .nav { flex-direction: row; gap: 8px; }
     .main { padding: 22px 16px 36px; }
-    .topbar h1 { font-size: 19px; }
+    .topbar h1 { font-size: 18px; }
+    .topbar p { font-size: 12px; }
+    .menu-toggle { width: 44px; height: 44px; }
     .card-head { padding: 18px 16px; }
     .stats { gap: 16px; }
+    .modal-card { padding: 22px 20px; }
   }
 </style>
 </head>
@@ -387,11 +550,20 @@
   <!-- ============ MAIN ============ -->
   <main class="main">
 
-    <!-- Topbar -->
+    <!-- Topbar (dengan tombol toggle sidebar) -->
     <header class="topbar">
-      <div>
-        <h1>Daftar Pasien Operasi Hari Ini</h1>
-        <p>15 pasien &middot; 5 kategori &middot; Total 2 lembar</p>
+      <div class="topbar-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Sembunyikan menu" title="Sembunyikan / tampilkan menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div>
+          <h1>Daftar Pasien Operasi Hari Ini</h1>
+          <p>15 pasien &middot; 5 kategori &middot; Total 2 lembar</p>
+        </div>
       </div>
       <div class="user-chip">
         <div class="avatar">AD</div>
@@ -441,7 +613,7 @@
         <div class="card-head-row">
           <div>
             <h2>Antrian Pasien</h2>
-            <div class="sub">Centang kotak di samping untuk menandai pasien sudah diperiksa.</div>
+            <div class="sub">Centang kotak untuk menandai pasien sudah diperiksa. Klik ikon pensil untuk mengedit data.</div>
           </div>
           <button class="btn btn-primary">+ Tambah Pasien</button>
         </div>
@@ -488,6 +660,7 @@
               <th>Diagnosa &amp; Tindakan</th>
               <th>Dokter</th>
               <th>Status</th>
+              <th style="width:64px;">Aksi</th>
             </tr>
           </thead>
 
@@ -518,6 +691,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             <!-- 2 -->
@@ -544,6 +724,13 @@
               <td>
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
               </td>
             </tr>
 
@@ -572,6 +759,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             <!-- 4 -->
@@ -598,6 +792,13 @@
               <td>
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
               </td>
             </tr>
 
@@ -626,6 +827,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             <!-- 6 -->
@@ -652,6 +860,13 @@
               <td>
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
               </td>
             </tr>
 
@@ -680,6 +895,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             <!-- 8 -->
@@ -706,6 +928,13 @@
               <td>
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
               </td>
             </tr>
 
@@ -734,6 +963,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             <!-- 10 -->
@@ -760,6 +996,13 @@
               <td>
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
               </td>
             </tr>
 
@@ -788,6 +1031,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             <!-- 12 -->
@@ -814,6 +1064,13 @@
               <td>
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
               </td>
             </tr>
 
@@ -842,6 +1099,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
             <!-- 14 -->
@@ -868,6 +1132,13 @@
               <td>
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
+              </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
               </td>
             </tr>
 
@@ -896,6 +1167,13 @@
                 <span class="badge wait status-wait">Menunggu</span>
                 <span class="badge done status-done">Sudah Dicek</span>
               </td>
+              <td>
+                <button class="btn-edit" title="Edit pasien">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </button>
+              </td>
             </tr>
 
           </tbody>
@@ -906,8 +1184,89 @@
   </main>
 </div>
 
+<!-- ============ MODAL EDIT ============ -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h3 id="modalTitle">Edit Data Pasien</h3>
+      <button type="button" class="modal-close" id="modalClose" aria-label="Tutup">&times;</button>
+    </div>
+
+    <form class="modal-form" id="editForm">
+      <div class="form-row">
+        <label>Nama Pasien
+          <input type="text" id="editNama" required>
+        </label>
+        <label>Umur (tahun)
+          <input type="text" id="editUmur">
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>No. MR
+          <input type="text" id="editMR">
+        </label>
+        <label>Kategori
+          <select id="editKategori">
+            <option value="bu">Bedah Umum</option>
+            <option value="ba">Bedah Anak</option>
+            <option value="uro">Uro</option>
+            <option value="tht">THT</option>
+            <option value="nunki">dr. Nunki</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>Ruang
+          <input type="text" id="editRuang" placeholder="—">
+        </label>
+        <label>Dokter
+          <input type="text" id="editDokter">
+        </label>
+      </div>
+
+      <label>Diagnosa
+        <input type="text" id="editDiagnosa">
+      </label>
+
+      <label>Tindakan
+        <input type="text" id="editTindakan">
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-cancel" id="modalCancel">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast notifikasi -->
+<div class="toast" id="toast">Data pasien berhasil diperbarui</div>
+
 <script>
-  /* ============ Logika checklist & filter ============ */
+  /* ==========================================================
+     A. SIDEBAR TOGGLE (sembunyikan / tampilkan navigasi)
+     ========================================================== */
+  const menuToggle = document.getElementById('menuToggle');
+
+  // Muat state terakhir
+  if (localStorage.getItem('sidebarHidden') === '1') {
+    document.body.classList.add('sidebar-hidden');
+    menuToggle.setAttribute('aria-label', 'Tampilkan menu');
+  }
+
+  menuToggle.addEventListener('click', () => {
+    document.body.classList.toggle('sidebar-hidden');
+    const hidden = document.body.classList.contains('sidebar-hidden');
+    localStorage.setItem('sidebarHidden', hidden ? '1' : '0');
+    menuToggle.setAttribute('aria-label', hidden ? 'Tampilkan menu' : 'Sembunyikan menu');
+  });
+
+  /* ==========================================================
+     B. CHECKLIST PASIEN — progress, statistik, filter
+     ========================================================== */
   const rowChecks   = document.querySelectorAll('.row-check');
   const checkAll    = document.getElementById('checkAll');
   const fill        = document.getElementById('progressFill');
@@ -917,10 +1276,8 @@
   const searchInput = document.getElementById('searchInput');
   const filterKat   = document.getElementById('filterKat');
   const filterStat  = document.getElementById('filterStatus');
+  const allRows     = [...document.querySelectorAll('#tableBody tr')];
 
-  const allRows = [...document.querySelectorAll('#tableBody tr')];
-
-  /* --- Progress & statistik (selalu berdasarkan SEMUA pasien) --- */
   function updateProgress() {
     const total = rowChecks.length;
     const done  = [...rowChecks].filter(c => c.checked).length;
@@ -934,15 +1291,13 @@
     checkAll.indeterminate = done > 0 && done < total;
   }
 
-  /* --- Filter & pencarian --- */
   function applyFilters() {
     const q      = searchInput.value.toLowerCase().trim();
     const kat    = filterKat.value;
     const status = filterStat.value;
 
     allRows.forEach(tr => {
-      const textRow  = tr.textContent.toLowerCase();
-      const matchQ   = !q || textRow.includes(q);
+      const matchQ   = !q || tr.textContent.toLowerCase().includes(q);
       const matchKat = kat === 'all' || tr.dataset.kat === kat;
       const checked  = tr.querySelector('.row-check').checked;
       const matchSt  = status === 'all'
@@ -953,13 +1308,10 @@
     });
   }
 
-  /* --- Event listeners --- */
-  rowChecks.forEach(c => {
-    c.addEventListener('change', () => {
-      updateProgress();
-      applyFilters();
-    });
-  });
+  rowChecks.forEach(c => c.addEventListener('change', () => {
+    updateProgress();
+    applyFilters();
+  }));
 
   checkAll.addEventListener('change', () => {
     rowChecks.forEach(c => c.checked = checkAll.checked);
@@ -971,7 +1323,124 @@
   filterKat.addEventListener('change', applyFilters);
   filterStat.addEventListener('change', applyFilters);
 
-  /* --- Inisialisasi --- */
+  /* ==========================================================
+     C. MODAL EDIT PASIEN
+     ========================================================== */
+  const kategoriMap = {
+    bu:    { label: 'Bedah Umum', cls: 'tosca'  },
+    ba:    { label: 'Bedah Anak', cls: 'purple' },
+    uro:   { label: 'Uro',        cls: 'tosca'  },
+    tht:   { label: 'THT',        cls: 'purple' },
+    nunki: { label: 'dr. Nunki',  cls: 'purple' }
+  };
+
+  const modal    = document.getElementById('editModal');
+  const form     = document.getElementById('editForm');
+  let currentRow = null;
+
+  function getRowData(row) {
+    return {
+      nama:     row.querySelector('.nama-pasien').textContent.trim(),
+      mr:       row.querySelector('.rm').textContent.replace(/^MR\s*/, '').trim(),
+      umur:     row.querySelector('.col-umur').textContent.replace(/\s*th$/, '').trim(),
+      kat:      row.dataset.kat,
+      ruang:    row.querySelector('.col-ruang').textContent.trim(),
+      diagnosa: row.querySelector('.cell-diagnosa').textContent.trim(),
+      tindakan: row.querySelector('.cell-tindakan').textContent.trim(),
+      dokter:   row.querySelector('.col-dokter').textContent.trim()
+    };
+  }
+
+  function setRowData(row, data) {
+    row.querySelector('.nama-pasien').textContent = data.nama || '—';
+    row.querySelector('.rm').textContent = 'MR ' + (data.mr || '—');
+    row.querySelector('.col-umur').textContent = data.umur ? data.umur + ' th' : '—';
+    row.dataset.kat = data.kat;
+
+    const info  = kategoriMap[data.kat];
+    const badge = row.querySelector('.badge-kat');
+    badge.textContent = info.label;
+    badge.className   = 'badge-kat ' + info.cls;
+
+    row.querySelector('.col-ruang').textContent    = data.ruang    || '—';
+    row.querySelector('.cell-diagnosa').textContent = data.diagnosa || '—';
+    row.querySelector('.cell-tindakan').textContent = data.tindakan || '—';
+    row.querySelector('.col-dokter').textContent   = data.dokter   || '—';
+  }
+
+  function openModal(row) {
+    currentRow = row;
+    const d = getRowData(row);
+
+    document.getElementById('editNama').value     = d.nama;
+    document.getElementById('editUmur').value     = d.umur;
+    document.getElementById('editMR').value       = d.mr;
+    document.getElementById('editKategori').value = d.kat;
+    document.getElementById('editRuang').value    = d.ruang === '—' ? '' : d.ruang;
+    document.getElementById('editDokter').value   = d.dokter;
+    document.getElementById('editDiagnosa').value = d.diagnosa;
+    document.getElementById('editTindakan').value = d.tindakan;
+
+    modal.classList.add('show');
+    setTimeout(() => document.getElementById('editNama').focus(), 80);
+  }
+
+  function closeModal() {
+    modal.classList.remove('show');
+    currentRow = null;
+  }
+
+  document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.closest('tr')));
+  });
+
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalCancel').addEventListener('click', closeModal);
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal) closeModal();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!currentRow) return;
+
+    const data = {
+      nama:     document.getElementById('editNama').value.trim(),
+      umur:     document.getElementById('editUmur').value.trim(),
+      mr:       document.getElementById('editMR').value.trim(),
+      kat:      document.getElementById('editKategori').value,
+      ruang:    document.getElementById('editRuang').value.trim(),
+      dokter:   document.getElementById('editDokter').value.trim(),
+      diagnosa: document.getElementById('editDiagnosa').value.trim(),
+      tindakan: document.getElementById('editTindakan').value.trim()
+    };
+
+    setRowData(currentRow, data);
+    closeModal();
+    applyFilters();
+    showToast('Data pasien berhasil diperbarui');
+  });
+
+  /* ==========================================================
+     D. TOAST
+     ========================================================== */
+  let toastTimer;
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  /* ==========================================================
+     Inisialisasi
+     ========================================================== */
   updateProgress();
   applyFilters();
 </script>
