@@ -3,211 +3,201 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Daftar Pasien — Neumorphism</title>
+<title>Dashboard Daftar Pasien </title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="layout">
-
-  <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-logo">K</div>
-      <div class="brand-text">
-        <strong>Klinik Sehat</strong>
-        <span>Panel Admin</span>
-      </div>
+      <div class="brand-text"><strong>KAMAR OPERASI</strong><span>PETUGAS JAGA MALAM</span></div>
     </div>
     <nav class="nav">
-      <span class="nav-label">Menu Utama</span>
-      <a href="#" class="active"><span class="ico">▦</span><span class="txt">Dashboard</span></a>
-      <a href="#"><span class="ico">👤</span><span class="txt">Pasien</span></a>
-      <a href="#"><span class="ico">🗓</span><span class="txt">Jadwal</span></a>
-      <a href="#"><span class="ico">📋</span><span class="txt">Rekam Medis</span></a>
-      <a href="#"><span class="ico">📊</span><span class="txt">Laporan</span></a>
-      <a href="#"><span class="ico">⚙</span><span class="txt">Pengaturan</span></a>
+      <span class="nav-label">Menu</span>
+      <a href="#" id="navDaftar" class="active"><span class="ico">📋</span><span class="txt">Daftar Operasi</span></a>
+      <a href="#" id="navInput"><span class="ico">➕</span><span class="txt">Input Pasien</span></a>
     </nav>
     <div class="sidebar-footer">v1.0.0 &middot; Sistem Antrian Pasien</div>
   </aside>
 
-  <!-- ============ MAIN ============ -->
   <main class="main">
     <header class="topbar">
       <div class="topbar-left">
-        <button class="menu-toggle" id="menuToggle" aria-label="Sembunyikan menu">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
         <div>
-          <h1>Daftar Pasien Operasi Hari Ini</h1>
+          <h1 id="pageTitle">Daftar Pasien Operasi Hari Ini</h1>
           <p><span id="subtitleCount">0</span> pasien &middot; 5 kategori</p>
         </div>
       </div>
       <div class="user-chip">
         <div class="avatar">AD</div>
-        <div class="who">
-          <strong>Admin Klinik</strong>
-          <span>Front Office</span>
-        </div>
+        <div class="who"><strong>PETUGAS</strong><span>shift malam</span></div>
       </div>
     </header>
 
-    <!-- Statistik -->
-    <section class="stats">
-      <div class="stat">
-        <div class="icon blue">👥</div>
-        <div>
-          <div class="val" id="statTotal">0</div>
-          <div class="lbl">Total Pasien</div>
+    <!-- ============ VIEW: DAFTAR OPERASI ============ -->
+    <section id="viewDaftar">
+      <section class="stats">
+        <div class="stat"><div class="icon blue">👥</div><div><div class="val" id="statTotal">0</div><div class="lbl">Total Pasien</div></div></div>
+        <div class="stat"><div class="icon green">✅</div><div><div class="val" id="statDone">0</div><div class="lbl">Sudah Dicek</div></div></div>
+        <div class="stat"><div class="icon amber">⏳</div><div><div class="val" id="statWait">0</div><div class="lbl">Belum Dicek</div></div></div>
+        <div class="stat"><div class="icon purple">🩺</div><div><div class="val">5</div><div class="lbl">Kategori</div></div></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-head-row">
+            <div>
+              <h2>Antrian Pasien</h2>
+              <div class="sub">Centang  sudah diperiksa.</div>
+            </div>
+            <div class="head-actions">
+              <button id="btnPrintPreview" class="btn btn-secondary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;">
+                  <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+                </svg>Print Preview
+              </button>
+              <button id="btnAdd" class="btn btn-primary">+ Input Pasien</button>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="search"><input type="text" id="searchInput" placeholder="Cari nama, MR, diagnosa, atau dokter..."></div>
+            <select class="filter" id="filterKat">
+              <option value="all">Semua Kategori</option>
+              <option value="Bedah Umum">Bedah Umum</option>
+              <option value="Bedah Anak">Bedah Anak</option>
+              <option value="Uro">Uro</option>
+              <option value="THT">THT</option>
+              <option value="dr. Nunki">dr. Nunki</option>
+            </select>
+            <select class="filter" id="filterStatus">
+              <option value="all">Semua Status</option>
+              <option value="wait">Belum Dicek</option>
+              <option value="done">Sudah Dicek</option>
+            </select>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            <span class="progress-text" id="progressText">0 dari 0 pasien sudah dicek</span>
+          </div>
         </div>
-      </div>
-      <div class="stat">
-        <div class="icon green">✅</div>
-        <div>
-          <div class="val" id="statDone">0</div>
-          <div class="lbl">Sudah Dicek</div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:52px;"><input type="checkbox" class="check" id="checkAll" title="Centang semua"></th>
+                <th style="width:44px;">No</th>
+                <th>Pasien</th><th>Umur</th><th>Kategori</th><th>Ruang</th>
+                <th>Diagnosa &amp; Tindakan</th><th>Dokter</th>
+                <th>Lab</th><th>Ket</th><th>Status</th>
+                <th style="width:88px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"><!-- JS render --></tbody>
+          </table>
         </div>
-      </div>
-      <div class="stat">
-        <div class="icon amber">⏳</div>
-        <div>
-          <div class="val" id="statWait">0</div>
-          <div class="lbl">Belum Dicek</div>
-        </div>
-      </div>
-      <div class="stat">
-        <div class="icon purple">🩺</div>
-        <div>
-          <div class="val">5</div>
-          <div class="lbl">Kategori</div>
-        </div>
-      </div>
+      </section>
     </section>
 
-    <!-- Kartu Tabel -->
-    <section class="card">
-      <div class="card-head">
-        <div class="card-head-row">
-          <div>
-            <h2>Antrian Pasien</h2>
-            <div class="sub">Centang kotak untuk menandai sudah diperiksa. Gunakan tombol aksi untuk edit/hapus.</div>
-          </div>
-          <div class="head-actions">
-            <button id="btnPrintPreview" class="btn btn-secondary">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;">
-                <polyline points="6 9 6 2 18 2 18 9"/>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                <rect x="6" y="14" width="12" height="8"/>
-              </svg>
-              Print Preview
-            </button>
-            <button id="btnAdd" class="btn btn-primary">+ Tambah Pasien</button>
+    <!-- ============ VIEW: INPUT PASIEN (form penuh) ============ -->
+    <section id="viewInput" style="display:none;">
+      <section class="card input-card">
+        <div class="card-head">
+          <div class="card-head-row">
+            <div>
+              <h2 id="inputFormTitle">Input Pasien Baru</h2>
+              <div class="sub">Lengkapi data pasien operasi. Data otomatis tersimpan setelah disubmit.</div>
+            </div>
           </div>
         </div>
-
-        <div class="toolbar">
-          <div class="search">
-            <input type="text" id="searchInput" placeholder="Cari nama, MR, diagnosa, atau dokter...">
-          </div>
-          <select class="filter" id="filterKat">
-            <option value="all">Semua Kategori</option>
-            <option value="Bedah Umum">Bedah Umum</option>
-            <option value="Bedah Anak">Bedah Anak</option>
-            <option value="Uro">Uro</option>
-            <option value="THT">THT</option>
-            <option value="dr. Nunki">dr. Nunki</option>
-          </select>
-          <select class="filter" id="filterStatus">
-            <option value="all">Semua Status</option>
-            <option value="wait">Belum Dicek</option>
-            <option value="done">Sudah Dicek</option>
-          </select>
-        </div>
-
-        <div class="progress-wrap">
-          <div class="progress-track">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
-          <span class="progress-text" id="progressText">0 dari 0 pasien sudah dicek</span>
-        </div>
+        <form id="inputFullForm" class="input-full-form">
+  <div class="input-grid">
+    <label>Nama Pasien <input type="text" id="ifNama" required placeholder="Tn./Ny./An. ..."></label>
+    <label>Umur (tahun) <input type="text" id="ifUmur" placeholder="45"></label>
+    <label>No. MR <input type="text" id="ifMR" placeholder="01468418"></label>
+    <label>Kategori
+      <select id="ifKategori">
+        <!-- Opsi diisi otomatis oleh JS dari SPESIALIS list -->
+      </select>
+    </label>
+    <label>Ruang <input type="text" id="ifRuang" placeholder="15.0 / —"></label>
+    <label>Dokter
+      <div class="autocomplete">
+        <input type="text" id="ifDokter" placeholder="Ketik nama dokter..." autocomplete="off">
+        <div class="suggestion-box" id="ifDokterSuggest"></div>
       </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:52px;">
-                <input type="checkbox" class="check" id="checkAll" title="Centang semua">
-              </th>
-              <th style="width:44px;">No</th>
-              <th>Pasien</th>
-              <th>Umur</th>
-              <th>Kategori</th>
-              <th>Ruang</th>
-              <th>Diagnosa &amp; Tindakan</th>
-              <th>Dokter</th>
-              <th>Status</th>
-              <th style="width:88px;">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody"><!-- diisi JS --></tbody>
-        </table>
-      </div>
+    </label>
+    <label class="span-2">Diagnosa <input type="text" id="ifDiagnosa" placeholder="diagnosa bedah"></label>
+    <label class="span-2">Tindakan <input type="text" id="ifTindakan" placeholder="tindakan bedah"></label>
+    <label class="span-2">Lab <input type="text" id="ifLab" placeholder="skrining"></label>
+    <label class="span-2">Keterangan <textarea id="ifKet" rows="2" placeholder="Catatan..."></textarea></label>
+  </div>
+  <div class="input-actions">
+    <button type="button" class="btn btn-cancel" id="btnInputReset">Reset</button>
+    <button type="submit" class="btn btn-primary" id="btnInputSave">Simpan Pasien</button>
+  </div>
+</form>
+      </section>
     </section>
   </main>
 </div>
 
-<!-- ============ MODAL TAMBAH / EDIT PASIEN ============ -->
+<!-- Modal Edit (dari daftar operasi) -->
 <div class="modal-overlay" id="patientModal">
-  <div class="modal-card" role="dialog" aria-modal="true">
+  <div class="modal-card">
     <div class="modal-head">
-      <h3 id="patientModalTitle">Tambah Pasien Baru</h3>
-      <button type="button" class="modal-close" data-close="patientModal" aria-label="Tutup">&times;</button>
+      <h3 id="patientModalTitle">Edit Data Pasien</h3>
+      <button type="button" class="modal-close" data-close="patientModal">&times;</button>
     </div>
-    <form class="modal-form" id="patientForm">
-      <div class="form-row">
-        <label>Nama Pasien <input type="text" id="fNama" required placeholder="Tn./Ny./An. ..."></label>
-        <label>Umur (tahun) <input type="text" id="fUmur" placeholder="45"></label>
+   <form class="modal-form" id="patientForm">
+  <div class="form-row">
+    <label>Nama Pasien <input type="text" id="fNama" required></label>
+    <label>Umur (tahun) <input type="text" id="fUmur"></label>
+  </div>
+  <div class="form-row">
+    <label>No. MR <input type="text" id="fMR"></label>
+    <label>Kategori
+      <select id="fKategori"><!-- JS --></select>
+    </label>
+  </div>
+  <div class="form-row">
+    <label>Ruang <input type="text" id="fRuang"></label>
+    <label>Dokter
+      <div class="autocomplete">
+        <input type="text" id="fDokter" placeholder="Ketik nama dokter..." autocomplete="off">
+        <div class="suggestion-box" id="fDokterSuggest"></div>
       </div>
-      <div class="form-row">
-        <label>No. MR <input type="text" id="fMR" placeholder="01468418"></label>
-        <label>Kategori
-          <select id="fKategori">
-            <option value="Bedah Umum">Bedah Umum</option>
-            <option value="Bedah Anak">Bedah Anak</option>
-            <option value="Uro">Uro</option>
-            <option value="THT">THT</option>
-            <option value="dr. Nunki">dr. Nunki</option>
-          </select>
-        </label>
-      </div>
-      <div class="form-row">
-        <label>Ruang <input type="text" id="fRuang" placeholder="15.0 / —"></label>
-        <label>Dokter <input type="text" id="fDokter" placeholder="dr. ..., Sp.B"></label>
-      </div>
-      <label>Diagnosa <input type="text" id="fDiagnosa" placeholder="Ulkus Cruris (D)"></label>
-      <label>Tindakan <input type="text" id="fTindakan" placeholder="Debridement"></label>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-cancel" data-close="patientModal">Batal</button>
-        <button type="submit" class="btn btn-primary" id="btnSavePatient">Simpan</button>
-      </div>
-    </form>
+    </label>
+  </div>
+  <label>Diagnosa <input type="text" id="fDiagnosa"></label>
+  <label>Tindakan <input type="text" id="fTindakan"></label>
+  <label>Lab <input type="text" id="fLab"></label>
+  <label>Keterangan <textarea id="fKet" rows="2"></textarea></label>
+  <div class="modal-actions">
+    <button type="button" class="btn btn-cancel" data-close="patientModal">Batal</button>
+    <button type="submit" class="btn btn-primary" id="btnSavePatient">Simpan</button>
+  </div>
+</form>
   </div>
 </div>
 
-<!-- ============ MODAL KONFIRMASI HAPUS ============ -->
+<!-- Modal Hapus -->
 <div class="modal-overlay" id="deleteModal">
-  <div class="modal-card modal-small" role="dialog" aria-modal="true">
+  <div class="modal-card modal-small">
     <div class="modal-head">
       <h3>Hapus Pasien</h3>
-      <button type="button" class="modal-close" data-close="deleteModal" aria-label="Tutup">&times;</button>
+      <button type="button" class="modal-close" data-close="deleteModal">&times;</button>
     </div>
-    <p class="confirm-text">Yakin ingin menghapus data pasien <strong id="deleteName">—</strong>? Tindakan ini tidak bisa dibatalkan.</p>
+    <p class="confirm-text">Yakin ingin menghapus <strong id="deleteName">—</strong>? Tindakan ini tidak bisa dibatalkan.</p>
     <div class="modal-actions">
       <button type="button" class="btn btn-cancel" data-close="deleteModal">Batal</button>
       <button type="button" class="btn btn-danger" id="btnConfirmDelete">Hapus</button>
@@ -215,58 +205,52 @@
   </div>
 </div>
 
-<!-- ============ MODAL PRINT PREVIEW ============ -->
+<!-- Modal Print Preview (landscape) -->
 <div class="modal-overlay" id="printModal">
   <div class="print-modal-card">
     <div class="print-toolbar no-print">
-      <h3>Print Preview — Daftar Pasien</h3>
+      <h3>Print Preview </h3>
       <div class="print-toolbar-actions">
         <button type="button" class="btn btn-cancel" data-close="printModal">Tutup</button>
         <button type="button" class="btn btn-primary" id="btnDoPrint">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;">
-            <polyline points="6 9 6 2 18 2 18 9"/>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8"/>
-          </svg>
-          Cetak Sekarang
+            <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+          </svg>Cetak Sekarang
         </button>
       </div>
     </div>
-
     <div class="print-paper" id="printArea">
       <div class="print-header">
-        <h1>KLINIK SEHAT</h1>
-        <p>Jl. Kesehatan No. 123, Jakarta &middot; Telp: (021) 1234-5678</p>
+        <h1>BEDAH CENTRAL RSUD KOJA</h1>
+        <p>Jl. Deli No.4 Koja Jakarta Utara</p>
         <hr>
-        <h2>DAFTAR PASIEN OPERASI</h2>
+        <h2>DAFTAR OPERASI</h2>
         <div class="print-meta">
           <span>Tanggal Cetak: <b id="printDate">—</b></span>
           <span>Total: <b id="printTotal">0</b> pasien</span>
         </div>
       </div>
-
       <table class="print-table">
         <thead>
           <tr>
-            <th>No</th>
-            <th>Nama Pasien</th>
-            <th>Umur</th>
-            <th>MR</th>
-            <th>Kategori</th>
-            <th>Ruang</th>
-            <th>Diagnosa</th>
-            <th>Tindakan</th>
-            <th>Dokter</th>
-            <th>Status</th>
+            <th style="width:3%;">No</th>
+            <th style="width:14%;">Nama Pasien</th>
+            <th style="width:5%;">Umur</th>
+            <th style="width:8%;">MR</th>
+            <th style="width:6%;">Ruang</th>
+            <th style="width:15%;">Diagnosa</th>
+            <th style="width:12%;">Tindakan</th>
+            <th style="width:11%;">Dokter</th>
+            <th style="width:9%;">Lab</th>
+            <th style="width:11%;">Ket</th>
           </tr>
         </thead>
         <tbody id="printTableBody"></tbody>
       </table>
-
       <div class="print-footer">
         <div class="ttd">
           <p>Jakarta, <span id="printDate2">—</span></p>
-          <p>Admin Klinik</p>
+          <p>PETUGAS JAGA MALAM</p>
           <div class="ttd-space"></div>
           <p><b>( ......................................... )</b></p>
         </div>
@@ -275,9 +259,8 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast">Data tersimpan</div>
 
-<script src="app.js"></script>
+<script src="app.js" defer></script>
 </body>
 </html>
