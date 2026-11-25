@@ -2,7 +2,7 @@
   'use strict';
   console.log('[Dashboard] app.js loaded');
 
-  const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbwW-XWkSdPhFp94qks9GvZxATAUaxdMVEDBeujyWeJRxN2Ew9bFswLo1xy0oGpNfEXb/exec', USE_API: false };
+  const CONFIG = { API_URL: 'https://script.google.com/macros/s/AKfycbwW-XWkSdPhFp94qks9GvZxATAUaxdMVEDBeujyWeJRxN2Ew9bFswLo1xy0oGpNfEXb/exec', USE_API: true };
 
   /* ---------- MASTER DATA: SPESIALIS & DOKTER ---------- */
   const DOKTER_LIST = [
