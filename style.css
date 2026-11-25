@@ -601,8 +601,8 @@ tr.filtered-out { display: none !important; }
   .print-paper .print-header p { font-size: 8.5px; }
   .print-paper .print-header h2 { font-size: 11px; }
   .print-paper .print-meta { font-size: 8.5px; }
-  .print-paper .print-table { font-size: 7.5px; }
-  .print-paper .print-table th { font-size: 7px; padding: 2.5px 3px; }
+  .print-paper .print-table { font-size: 5px; }
+  .print-paper .print-table th { font-size: 5px; padding: 2.5px 3px; }
   .print-paper .print-table td { padding: 2.5px 3px; }
   .print-paper .print-footer { margin-top: 8px; }
   .print-paper .print-footer .ttd { font-size: 8.5px; }
