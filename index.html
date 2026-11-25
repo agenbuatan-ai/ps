@@ -4,519 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Daftar Pasien — Neumorphism</title>
-<style>
-  /* ================= RESET & VARIABEL ================= */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --bg: #e4e8ee;
-    --text: #3d4a5c;
-    --muted: #8b97a8;
-
-    --tosca: #14b8a6;
-    --tosca-deep: #0d9488;
-    --purple: #8b5cf6;
-    --purple-deep: #7c3aed;
-
-    --sh-raise: 7px 7px 15px #c3c9d2, -7px -7px 15px #ffffff;
-    --sh-raise-sm: 4px 4px 9px #c3c9d2, -4px -4px 9px #ffffff;
-    --sh-hover: 9px 9px 18px #bfc6d0, -9px -9px 18px #ffffff;
-    --sh-inset: inset 5px 5px 10px #c3c9d2, inset -5px -5px 10px #ffffff;
-    --sh-inset-sm: inset 3px 3px 6px #c3c9d2, inset -3px -3px 6px #ffffff;
-    --sh-tosca: 5px 5px 12px #b8d6d1, -5px -5px 12px #ffffff;
-
-    --radius: 20px;
-  }
-
-  body {
-    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ================= LAYOUT (FLEX agar sidebar bisa di-hide halus) ================= */
-  .layout {
-    display: flex;
-    min-height: 100vh;
-  }
-
-  /* ================= SIDEBAR ================= */
-  .sidebar {
-    width: 250px;
-    flex-shrink: 0;
-    background: var(--bg);
-    padding: 26px 18px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    gap: 26px;
-    box-shadow: 8px 0 20px -12px rgba(163, 172, 186, .55);
-    z-index: 5;
-    overflow-y: auto;
-    transition: margin-left .35s cubic-bezier(.4, 0, .2, 1), opacity .3s ease;
-  }
-
-  /* --- State sidebar disembunyikan --- */
-  body.sidebar-hidden .sidebar {
-    margin-left: -250px;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .brand { display: flex; align-items: center; gap: 13px; padding: 0 6px; }
-
-  .brand-logo {
-    width: 44px; height: 44px; border-radius: 14px;
-    background: var(--bg); box-shadow: var(--sh-raise-sm);
-    display: grid; place-items: center;
-    color: var(--tosca-deep); font-weight: 800; font-size: 19px;
-    flex-shrink: 0; position: relative;
-  }
-  .brand-logo::after {
-    content: ""; position: absolute; inset: 4px; border-radius: 10px;
-    box-shadow: var(--sh-inset-sm); opacity: .45; pointer-events: none;
-  }
-
-  .brand-text strong { display: block; font-size: 15px; letter-spacing: .2px; color: var(--text); }
-  .brand-text span { font-size: 11.5px; color: var(--muted); }
-
-  .nav { display: flex; flex-direction: column; gap: 9px; }
-
-  .nav-label {
-    font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.2px;
-    color: var(--muted); padding: 0 12px; margin-bottom: 6px; font-weight: 700;
-  }
-
-  .nav a {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px; border-radius: 14px;
-    color: var(--muted); text-decoration: none;
-    font-size: 14px; font-weight: 600;
-    transition: box-shadow .22s, color .22s, transform .15s;
-  }
-  .nav a:hover { box-shadow: var(--sh-raise-sm); color: var(--text); }
-  .nav a:active { box-shadow: var(--sh-inset-sm); }
-  .nav a.active { color: var(--purple-deep); box-shadow: var(--sh-inset); }
-  .nav a.active .ico { color: var(--purple-deep); }
-  .nav .ico { font-size: 16px; width: 18px; text-align: center; color: var(--muted); transition: color .22s; }
-  .nav a:hover .ico { color: var(--tosca-deep); }
-
-  .sidebar-footer {
-    margin-top: auto; font-size: 11.5px; color: var(--muted);
-    padding: 14px 12px; line-height: 1.6; border-radius: 14px;
-    box-shadow: var(--sh-inset-sm); text-align: center;
-  }
-
-  /* ================= MAIN ================= */
-  .main { flex: 1; min-width: 0; padding: 32px 36px 48px; }
-
-  /* --- Topbar dengan tombol toggle --- */
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 18px; flex-wrap: wrap; margin-bottom: 30px;
-  }
-  .topbar-left {
-    display: flex; align-items: center; gap: 16px;
-  }
-  .topbar h1 { font-size: 23px; letter-spacing: -.3px; color: var(--text); }
-  .topbar p { font-size: 13.5px; color: var(--muted); margin-top: 5px; }
-
-  .menu-toggle {
-    width: 48px; height: 48px;
-    border: none; border-radius: 14px;
-    background: var(--bg);
-    box-shadow: var(--sh-raise-sm);
-    cursor: pointer;
-    color: var(--text);
-    display: grid; place-items: center;
-    transition: box-shadow .22s, color .22s, transform .12s;
-    flex-shrink: 0;
-  }
-  .menu-toggle:hover { box-shadow: var(--sh-raise); color: var(--purple-deep); }
-  .menu-toggle:active { box-shadow: var(--sh-inset-sm); transform: scale(.94); }
-
-  .user-chip {
-    display: flex; align-items: center; gap: 11px;
-    background: var(--bg); padding: 9px 18px 9px 9px;
-    border-radius: 999px; box-shadow: var(--sh-raise-sm);
-  }
-  .user-chip .avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: var(--bg); box-shadow: var(--sh-inset-sm);
-    color: var(--purple-deep); display: grid; place-items: center;
-    font-size: 13px; font-weight: 800; flex-shrink: 0;
-  }
-  .user-chip .who strong { display: block; font-size: 13px; color: var(--text); }
-  .user-chip .who span { font-size: 11.5px; color: var(--muted); }
-
-  /* ================= STAT CARDS ================= */
-  .stats {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
-    gap: 22px; margin-bottom: 30px;
-  }
-  .stat {
-    background: var(--bg); border-radius: var(--radius);
-    padding: 20px 22px; box-shadow: var(--sh-raise);
-    display: flex; gap: 15px; align-items: center;
-    transition: box-shadow .25s, transform .25s;
-  }
-  .stat:hover { box-shadow: var(--sh-hover); transform: translateY(-2px); }
-  .stat .icon {
-    width: 48px; height: 48px; border-radius: 15px;
-    display: grid; place-items: center; font-size: 20px; flex-shrink: 0;
-    background: var(--bg); box-shadow: var(--sh-inset-sm);
-  }
-  .stat .icon.blue, .stat .icon.green { color: var(--tosca-deep); }
-  .stat .icon.amber, .stat .icon.purple { color: var(--purple-deep); }
-  .stat .val { font-size: 23px; font-weight: 800; line-height: 1.1; color: var(--text); font-variant-numeric: tabular-nums; }
-  .stat .lbl { font-size: 12.5px; color: var(--muted); margin-top: 4px; font-weight: 600; }
-
-  /* ================= CARD / TABEL ================= */
-  .card { background: var(--bg); border-radius: 26px; box-shadow: var(--sh-raise); padding: 8px; overflow: hidden; }
-
-  .card-head { padding: 22px 24px 20px; display: flex; flex-direction: column; gap: 18px; }
-  .card-head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .card-head h2 { font-size: 16.5px; letter-spacing: -.2px; color: var(--text); }
-  .card-head .sub { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
-
-  .toolbar { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-
-  .search { position: relative; flex: 1 1 230px; min-width: 180px; }
-  .search input {
-    width: 100%; padding: 12px 16px 12px 40px;
-    border: none; border-radius: 14px;
-    background: var(--bg); box-shadow: var(--sh-inset-sm);
-    font-size: 13.5px; font-family: inherit; color: var(--text);
-    outline: none; transition: box-shadow .22s;
-  }
-  .search input::placeholder { color: var(--muted); }
-  .search input:focus { box-shadow: var(--sh-inset); }
-  .search::before {
-    content: "🔍"; position: absolute; left: 15px; top: 50%;
-    transform: translateY(-50%); font-size: 12px; opacity: .55; pointer-events: none;
-  }
-
-  select.filter {
-    padding: 12px 16px; border: none; border-radius: 14px;
-    background: var(--bg); box-shadow: var(--sh-raise-sm);
-    font-size: 13.5px; font-family: inherit; font-weight: 600;
-    color: var(--text); cursor: pointer; outline: none;
-    transition: box-shadow .22s;
-  }
-  select.filter:focus, select.filter:hover { box-shadow: var(--sh-raise); }
-
-  .btn {
-    padding: 12px 20px; border: none; border-radius: 14px;
-    font-size: 13.5px; font-weight: 700; font-family: inherit;
-    cursor: pointer; transition: box-shadow .22s, color .22s, transform .12s;
-    background: var(--bg);
-  }
-  .btn-primary { color: var(--tosca-deep); box-shadow: var(--sh-tosca); }
-  .btn-primary:hover {
-    box-shadow: 8px 8px 18px #adcfc9, -8px -8px 18px #ffffff;
-    transform: translateY(-1px);
-  }
-  .btn-primary:active { box-shadow: var(--sh-inset-sm); transform: translateY(0); }
-
-  /* Progress */
-  .progress-wrap { display: flex; align-items: center; gap: 16px; }
-  .progress-track {
-    flex: 1; height: 14px; background: var(--bg);
-    border-radius: 999px; box-shadow: var(--sh-inset-sm);
-    padding: 3px; min-width: 120px; overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%; width: 0%; border-radius: 999px;
-    background: linear-gradient(90deg, var(--tosca), var(--purple));
-    box-shadow: 0 0 8px rgba(139, 92, 246, .35);
-    transition: width .4s cubic-bezier(.4, 0, .2, 1);
-  }
-  .progress-text { font-size: 12.5px; color: var(--muted); white-space: nowrap; font-weight: 700; }
-
-  /* ================= TABEL ================= */
-  .table-wrap { overflow-x: auto; border-radius: 20px; padding: 4px 8px 8px; }
-
-  table {
-    width: 100%; border-collapse: separate;
-    border-spacing: 0 10px; min-width: 1280px;
-  }
-
-  thead th {
-    text-align: left; font-size: 10.5px;
-    text-transform: uppercase; letter-spacing: 1px;
-    color: var(--muted); font-weight: 800;
-    padding: 6px 12px 12px; white-space: nowrap;
-  }
-
-  tbody td {
-    padding: 13px 12px;
-    font-size: 13.5px;
-    background: var(--bg);
-    vertical-align: middle;
-    transition: background .25s, box-shadow .25s;
-  }
-  tbody tr td:first-child { border-radius: 16px 0 0 16px; padding-left: 18px; }
-  tbody tr td:last-child { border-radius: 0 16px 16px 0; padding-right: 18px; }
-  tbody tr { transition: transform .18s; }
-  tbody tr:hover td { box-shadow: inset 0 1px 0 #ffffff, inset 0 -1px 0 #c9cfd8; }
-
-  /* Kolom spesifik */
-  .col-no { text-align: center; font-weight: 800; color: var(--muted); font-size: 12px; width: 44px; }
-  .col-umur { white-space: nowrap; font-weight: 600; font-size: 12.5px; }
-  .col-ruang { font-size: 12px; color: var(--text); font-weight: 700; white-space: nowrap; }
-  .col-dokter { font-size: 12px; color: var(--muted); font-weight: 600; min-width: 130px; }
-  .cell-diagnosa { font-weight: 600; color: var(--text); font-size: 12.8px; line-height: 1.35; }
-  .cell-tindakan { font-size: 11.5px; color: var(--purple-deep); font-weight: 700; margin-top: 4px; }
-
-  /* Badge kategori */
-  .badge-kat {
-    display: inline-block; padding: 5px 11px;
-    border-radius: 8px; font-size: 11px; font-weight: 800;
-    background: var(--bg); box-shadow: var(--sh-inset-sm);
-    white-space: nowrap;
-  }
-  .badge-kat.tosca  { color: var(--tosca-deep); }
-  .badge-kat.purple { color: var(--purple-deep); }
-
-  /* ================= CHECKBOX ================= */
-  .check {
-    appearance: none; -webkit-appearance: none;
-    width: 26px; height: 26px; border: none; border-radius: 9px;
-    background: var(--bg); box-shadow: var(--sh-raise-sm);
-    cursor: pointer; position: relative; display: inline-block;
-    vertical-align: middle; transition: box-shadow .22s, transform .12s;
-  }
-  .check:hover { box-shadow: var(--sh-raise); }
-  .check:active { transform: scale(.92); }
-  .check:checked {
-    box-shadow: var(--sh-inset);
-    background: linear-gradient(135deg, rgba(20, 184, 166, .14), rgba(139, 92, 246, .14));
-  }
-  .check:checked::after {
-    content: ""; position: absolute; left: 8px; top: 3px;
-    width: 6px; height: 12px;
-    border: solid var(--tosca-deep); border-width: 0 3px 3px 0;
-    transform: rotate(45deg);
-    filter: drop-shadow(1px 1px 1px rgba(255, 255, 255, .9));
-  }
-  .check:focus-visible { outline: 3px solid rgba(139, 92, 246, .3); outline-offset: 3px; }
-
-  /* --- Tombol Edit --- */
-  .btn-edit {
-    width: 38px; height: 38px;
-    border: none; border-radius: 10px;
-    background: var(--bg);
-    box-shadow: var(--sh-raise-sm);
-    cursor: pointer;
-    color: var(--purple-deep);
-    display: inline-grid; place-items: center;
-    transition: box-shadow .22s, color .22s, transform .12s;
-  }
-  .btn-edit:hover { box-shadow: var(--sh-raise); color: var(--tosca-deep); }
-  .btn-edit:active { box-shadow: var(--sh-inset-sm); transform: scale(.9); }
-  .btn-edit svg { display: block; }
-
-  /* ================= BARIS SUDAH DICEK ================= */
-  tbody tr:has(.check:checked) td {
-    background: linear-gradient(135deg, #dfe9e7, #e2dfef);
-    box-shadow: var(--sh-inset-sm);
-  }
-  tbody tr:has(.check:checked) .nama-pasien {
-    text-decoration: line-through;
-    color: var(--muted);
-  }
-  tbody tr:has(.check:checked) .avatar-sm {
-    opacity: .6;
-    filter: grayscale(.6);
-  }
-
-  /* ================= BADGE STATUS ================= */
-  .badge {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 7px 14px; border-radius: 999px;
-    font-size: 11.5px; font-weight: 800; white-space: nowrap;
-    background: var(--bg); box-shadow: var(--sh-raise-sm);
-  }
-  .badge::before {
-    content: ""; width: 7px; height: 7px; border-radius: 50%;
-    background: currentColor; box-shadow: 0 0 6px currentColor;
-  }
-  .badge.wait { color: var(--purple-deep); }
-  .badge.done { color: var(--tosca-deep); }
-
-  .status-done { display: none; }
-  tbody tr:has(.check:checked) .status-wait { display: none; }
-  tbody tr:has(.check:checked) .status-done {
-    display: inline-flex; box-shadow: var(--sh-inset-sm);
-  }
-
-  /* ================= SEL PASIEN ================= */
-  .pasien { display: flex; align-items: center; gap: 12px; min-width: 170px; }
-  .avatar-sm {
-    width: 38px; height: 38px; border-radius: 50%;
-    display: grid; place-items: center;
-    font-size: 11.5px; font-weight: 800; flex-shrink: 0;
-    background: var(--bg); box-shadow: var(--sh-inset-sm);
-    transition: opacity .25s, filter .25s;
-  }
-  .a1, .a3, .a5 { color: var(--tosca-deep); }
-  .a2, .a4, .a6 { color: var(--purple-deep); }
-
-  .nama-pasien { font-weight: 700; color: var(--text); transition: color .25s; font-size: 13px; }
-  .rm { font-size: 11.5px; color: var(--muted); margin-top: 3px; font-weight: 600; }
-
-  tr.filtered-out { display: none !important; }
-
-  /* ================= MODAL EDIT ================= */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(180, 190, 205, .5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    display: none;
-    align-items: center; justify-content: center;
-    z-index: 100;
-    padding: 20px;
-  }
-  .modal-overlay.show { display: flex; animation: fadeIn .2s ease; }
-  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-
-  .modal-card {
-    background: var(--bg);
-    border-radius: 22px;
-    box-shadow: 14px 14px 32px #c3c9d2, -14px -14px 32px #ffffff;
-    padding: 26px 28px;
-    width: 100%; max-width: 560px;
-    max-height: 90vh; overflow-y: auto;
-    animation: popIn .28s cubic-bezier(.4, 0, .2, 1);
-  }
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(.95) translateY(12px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-  }
-
-  .modal-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 22px;
-  }
-  .modal-head h3 {
-    font-size: 18px; color: var(--text); letter-spacing: -.2px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .modal-head h3::before {
-    content: "✎";
-    width: 34px; height: 34px; border-radius: 10px;
-    background: var(--bg); box-shadow: var(--sh-inset-sm);
-    display: grid; place-items: center;
-    color: var(--purple-deep); font-size: 15px;
-  }
-  .modal-close {
-    width: 38px; height: 38px; border: none; border-radius: 11px;
-    background: var(--bg); box-shadow: var(--sh-raise-sm);
-    cursor: pointer; color: var(--muted); font-size: 22px; line-height: 1;
-    transition: box-shadow .2s, color .2s, transform .1s;
-  }
-  .modal-close:hover { box-shadow: var(--sh-raise); color: var(--text); }
-  .modal-close:active { box-shadow: var(--sh-inset-sm); transform: scale(.92); }
-
-  .modal-form { display: flex; flex-direction: column; gap: 16px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-  .modal-form label {
-    display: flex; flex-direction: column; gap: 7px;
-    font-size: 11px; font-weight: 800;
-    color: var(--muted);
-    text-transform: uppercase; letter-spacing: .6px;
-  }
-
-  .modal-form input,
-  .modal-form select {
-    width: 100%;
-    padding: 11px 14px;
-    border: none; border-radius: 11px;
-    background: var(--bg);
-    box-shadow: var(--sh-inset-sm);
-    font-family: inherit; font-size: 13px;
-    color: var(--text);
-    outline: none;
-    transition: box-shadow .2s;
-  }
-  .modal-form input:focus,
-  .modal-form select:focus { box-shadow: var(--sh-inset); }
-
-  .modal-actions {
-    display: flex; gap: 12px; justify-content: flex-end;
-    margin-top: 10px;
-  }
-  .btn-cancel {
-    color: var(--muted);
-    box-shadow: var(--sh-raise-sm);
-  }
-  .btn-cancel:hover { color: var(--text); box-shadow: var(--sh-raise); }
-
-  /* ================= TOAST ================= */
-  .toast {
-    position: fixed; bottom: 30px; left: 50%;
-    transform: translateX(-50%) translateY(120px);
-    background: var(--bg);
-    box-shadow: var(--sh-raise);
-    color: var(--tosca-deep);
-    padding: 14px 24px;
-    border-radius: 14px;
-    font-weight: 800; font-size: 13.5px;
-    display: flex; align-items: center; gap: 10px;
-    opacity: 0;
-    transition: opacity .3s ease, transform .3s cubic-bezier(.4, 0, .2, 1);
-    z-index: 200;
-    pointer-events: none;
-  }
-  .toast::before { content: "✓"; font-size: 15px; }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ================= RESPONSIF ================= */
-  @media (max-width: 1024px) {
-    .sidebar { width: 84px; padding: 26px 14px; }
-    body.sidebar-hidden .sidebar { margin-left: -84px; }
-    .brand-text, .nav-label, .nav a span.txt, .sidebar-footer { display: none; }
-    .nav a { justify-content: center; padding: 13px; }
-    .brand { justify-content: center; padding: 0; }
-    .main { padding: 26px 22px 40px; }
-    .form-row { grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 720px) {
-    .layout { flex-direction: column; }
-    .sidebar {
-      width: 100%;
-      height: auto;
-      position: static;
-      flex-direction: row;
-      align-items: center;
-      padding: 14px 16px;
-      gap: 12px;
-      overflow-x: auto;
-      overflow-y: visible;
-      box-shadow: 0 8px 20px -12px rgba(163, 172, 186, .7);
-    }
-    body.sidebar-hidden .sidebar {
-      display: none;
-      margin-left: 0;
-    }
-    .nav { flex-direction: row; gap: 8px; }
-    .main { padding: 22px 16px 36px; }
-    .topbar h1 { font-size: 18px; }
-    .topbar p { font-size: 12px; }
-    .menu-toggle { width: 44px; height: 44px; }
-    .card-head { padding: 18px 16px; }
-    .stats { gap: 16px; }
-    .modal-card { padding: 22px 20px; }
-  }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -531,7 +19,6 @@
         <span>Panel Admin</span>
       </div>
     </div>
-
     <nav class="nav">
       <span class="nav-label">Menu Utama</span>
       <a href="#" class="active"><span class="ico">▦</span><span class="txt">Dashboard</span></a>
@@ -541,19 +28,14 @@
       <a href="#"><span class="ico">📊</span><span class="txt">Laporan</span></a>
       <a href="#"><span class="ico">⚙</span><span class="txt">Pengaturan</span></a>
     </nav>
-
-    <div class="sidebar-footer">
-      v1.0.0 &middot; Sistem Antrian Pasien
-    </div>
+    <div class="sidebar-footer">v1.0.0 &middot; Sistem Antrian Pasien</div>
   </aside>
 
   <!-- ============ MAIN ============ -->
   <main class="main">
-
-    <!-- Topbar (dengan tombol toggle sidebar) -->
     <header class="topbar">
       <div class="topbar-left">
-        <button class="menu-toggle" id="menuToggle" aria-label="Sembunyikan menu" title="Sembunyikan / tampilkan menu">
+        <button class="menu-toggle" id="menuToggle" aria-label="Sembunyikan menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/>
             <line x1="3" y1="12" x2="21" y2="12"/>
@@ -562,7 +44,7 @@
         </button>
         <div>
           <h1>Daftar Pasien Operasi Hari Ini</h1>
-          <p>15 pasien &middot; 5 kategori &middot; Total 2 lembar</p>
+          <p><span id="subtitleCount">0</span> pasien &middot; 5 kategori</p>
         </div>
       </div>
       <div class="user-chip">
@@ -579,7 +61,7 @@
       <div class="stat">
         <div class="icon blue">👥</div>
         <div>
-          <div class="val">15</div>
+          <div class="val" id="statTotal">0</div>
           <div class="lbl">Total Pasien</div>
         </div>
       </div>
@@ -593,7 +75,7 @@
       <div class="stat">
         <div class="icon amber">⏳</div>
         <div>
-          <div class="val" id="statWait">15</div>
+          <div class="val" id="statWait">0</div>
           <div class="lbl">Belum Dicek</div>
         </div>
       </div>
@@ -608,14 +90,23 @@
 
     <!-- Kartu Tabel -->
     <section class="card">
-
       <div class="card-head">
         <div class="card-head-row">
           <div>
             <h2>Antrian Pasien</h2>
-            <div class="sub">Centang kotak untuk menandai pasien sudah diperiksa. Klik ikon pensil untuk mengedit data.</div>
+            <div class="sub">Centang kotak untuk menandai sudah diperiksa. Gunakan tombol aksi untuk edit/hapus.</div>
           </div>
-          <button class="btn btn-primary">+ Tambah Pasien</button>
+          <div class="head-actions">
+            <button id="btnPrintPreview" class="btn btn-secondary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
+              </svg>
+              Print Preview
+            </button>
+            <button id="btnAdd" class="btn btn-primary">+ Tambah Pasien</button>
+          </div>
         </div>
 
         <div class="toolbar">
@@ -624,11 +115,11 @@
           </div>
           <select class="filter" id="filterKat">
             <option value="all">Semua Kategori</option>
-            <option value="bu">Bedah Umum</option>
-            <option value="ba">Bedah Anak</option>
-            <option value="uro">Uro</option>
-            <option value="tht">THT</option>
-            <option value="nunki">dr. Nunki</option>
+            <option value="Bedah Umum">Bedah Umum</option>
+            <option value="Bedah Anak">Bedah Anak</option>
+            <option value="Uro">Uro</option>
+            <option value="THT">THT</option>
+            <option value="dr. Nunki">dr. Nunki</option>
           </select>
           <select class="filter" id="filterStatus">
             <option value="all">Semua Status</option>
@@ -641,7 +132,7 @@
           <div class="progress-track">
             <div class="progress-fill" id="progressFill"></div>
           </div>
-          <span class="progress-text" id="progressText">0 dari 15 pasien sudah dicek</span>
+          <span class="progress-text" id="progressText">0 dari 0 pasien sudah dicek</span>
         </div>
       </div>
 
@@ -660,790 +151,133 @@
               <th>Diagnosa &amp; Tindakan</th>
               <th>Dokter</th>
               <th>Status</th>
-              <th style="width:64px;">Aksi</th>
+              <th style="width:88px;">Aksi</th>
             </tr>
           </thead>
-
-          <tbody id="tableBody">
-
-            <!-- 1 -->
-            <tr data-kat="bu">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">1</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a1">AP</div>
-                  <div>
-                    <div class="nama-pasien">Tn. Ahmad Payapo</div>
-                    <div class="rm">MR 01468418</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">75 th</td>
-              <td><span class="badge-kat tosca">Bedah Umum</span></td>
-              <td class="col-ruang">15.0</td>
-              <td>
-                <div class="cell-diagnosa">Ulkus Cruris (D)</div>
-                <div class="cell-tindakan">Debridement</div>
-              </td>
-              <td class="col-dokter">dr. Tiko, Sp.B</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 2 -->
-            <tr data-kat="bu">
-              <td><input type="checkbox" class="check row-check" checked></td>
-              <td class="col-no">2</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a2">F</div>
-                  <div>
-                    <div class="nama-pasien">Ma. Femi</div>
-                    <div class="rm">MR 00460404</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">26 th</td>
-              <td><span class="badge-kat tosca">Bedah Umum</span></td>
-              <td class="col-ruang">—</td>
-              <td>
-                <div class="cell-diagnosa">Limfadenopati Colli Bilateral</div>
-                <div class="cell-tindakan">Eksisi Biopsi</div>
-              </td>
-              <td class="col-dokter">dr. Andri, Sp.B</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 3 -->
-            <tr data-kat="bu">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">3</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a3">J</div>
-                  <div>
-                    <div class="nama-pasien">Tn. Jamsi…</div>
-                    <div class="rm">MR 00539839</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">50 th</td>
-              <td><span class="badge-kat tosca">Bedah Umum</span></td>
-              <td class="col-ruang">—</td>
-              <td>
-                <div class="cell-diagnosa">Hernia Inguinalis (S)</div>
-                <div class="cell-tindakan">Hernioplasty</div>
-              </td>
-              <td class="col-dokter">dr. Christopher, Sp.B</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 4 -->
-            <tr data-kat="bu">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">4</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a4">S</div>
-                  <div>
-                    <div class="nama-pasien">Tn. Siprianus</div>
-                    <div class="rm">MR 00237402</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">52 th</td>
-              <td><span class="badge-kat tosca">Bedah Umum</span></td>
-              <td class="col-ruang">6.C</td>
-              <td>
-                <div class="cell-diagnosa">Ileus Obstruksi</div>
-                <div class="cell-tindakan">Laparotomi</div>
-              </td>
-              <td class="col-dokter">dr. Yusak, Sp.BD</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 5 -->
-            <tr data-kat="bu">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">5</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a5">R</div>
-                  <div>
-                    <div class="nama-pasien">Tn. Rasiman</div>
-                    <div class="rm">MR 00575652</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">60 th</td>
-              <td><span class="badge-kat tosca">Bedah Umum</span></td>
-              <td class="col-ruang">5.C</td>
-              <td>
-                <div class="cell-diagnosa">Hernia Inguinalis Lateral (S)</div>
-                <div class="cell-tindakan">Hernioplasty</div>
-              </td>
-              <td class="col-dokter">dr. Christopher, Sp.B</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 6 -->
-            <tr data-kat="bu">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">6</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a6">Z</div>
-                  <div>
-                    <div class="nama-pasien">Ny. Zehrani</div>
-                    <div class="rm">MR 00628278</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">75 th</td>
-              <td><span class="badge-kat tosca">Bedah Umum</span></td>
-              <td class="col-ruang">2.D PP</td>
-              <td>
-                <div class="cell-diagnosa">Gangren DM Pedis (S)</div>
-                <div class="cell-tindakan">Amputasi Below Knee</div>
-              </td>
-              <td class="col-dokter">dr. Tiko, Sp.B</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 7 -->
-            <tr data-kat="ba">
-              <td><input type="checkbox" class="check row-check" checked></td>
-              <td class="col-no">7</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a1">K</div>
-                  <div>
-                    <div class="nama-pasien">An. Keenan</div>
-                    <div class="rm">MR 00796112</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">2 th</td>
-              <td><span class="badge-kat purple">Bedah Anak</span></td>
-              <td class="col-ruang">12.D</td>
-              <td>
-                <div class="cell-diagnosa">Abses Thorax</div>
-                <div class="cell-tindakan">Drainase</div>
-              </td>
-              <td class="col-dokter">dr. Rico, Sp.BA(K)</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 8 -->
-            <tr data-kat="uro">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">8</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a2">AT</div>
-                  <div>
-                    <div class="nama-pasien">Tn. Adi Tersia</div>
-                    <div class="rm">MR 01463478</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">43 th</td>
-              <td><span class="badge-kat tosca">Uro</span></td>
-              <td class="col-ruang">7.A</td>
-              <td>
-                <div class="cell-diagnosa">Batu Ureter Distal Kanan</div>
-                <div class="cell-tindakan">URS, Laser Tripsi</div>
-              </td>
-              <td class="col-dokter">dr. Rinto, Sp.U</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 9 -->
-            <tr data-kat="tht">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">9</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a3">A</div>
-                  <div>
-                    <div class="nama-pasien">Tn. Alamsyah</div>
-                    <div class="rm">MR 01449229</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">19 th</td>
-              <td><span class="badge-kat purple">THT</span></td>
-              <td class="col-ruang">—</td>
-              <td>
-                <div class="cell-diagnosa">Tonsilitis Kronik</div>
-                <div class="cell-tindakan">Tonsilektomi</div>
-              </td>
-              <td class="col-dokter">dr. Aroyan, Sp.THT.KL</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 10 -->
-            <tr data-kat="nunki">
-              <td><input type="checkbox" class="check row-check" checked></td>
-              <td class="col-no">10</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a4">I</div>
-                  <div>
-                    <div class="nama-pasien">Ny. Isnuti</div>
-                    <div class="rm">MR 00581858</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">32 th</td>
-              <td><span class="badge-kat purple">dr. Nunki</span></td>
-              <td class="col-ruang">5.C</td>
-              <td>
-                <div class="cell-diagnosa">G3 P2 A0 40 mg, TBJ 4,1 Kg</div>
-                <div class="cell-tindakan">SC, IUD</div>
-              </td>
-              <td class="col-dokter">dr. Nunki, Sp.OG</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 11 -->
-            <tr data-kat="nunki">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">11</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a5">M</div>
-                  <div>
-                    <div class="nama-pasien">Ny. Melindah</div>
-                    <div class="rm">MR 00441700</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">30 th</td>
-              <td><span class="badge-kat purple">dr. Nunki</span></td>
-              <td class="col-ruang">Apus</td>
-              <td>
-                <div class="cell-diagnosa">G3 P1 A1 H38 BSC 1x, TBJ 2,4 Kg</div>
-                <div class="cell-tindakan">SC, Implant</div>
-              </td>
-              <td class="col-dokter">dr. Nunki, Sp.OG</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 12 -->
-            <tr data-kat="nunki">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">12</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a6">H</div>
-                  <div>
-                    <div class="nama-pasien">Ny. Hanica</div>
-                    <div class="rm">MR 01448531</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">26 th</td>
-              <td><span class="badge-kat purple">dr. Nunki</span></td>
-              <td class="col-ruang">—</td>
-              <td>
-                <div class="cell-diagnosa">G2 P1 A0 H38 BSC 1x, TBJ 2.900</div>
-                <div class="cell-tindakan">SC, IUD</div>
-              </td>
-              <td class="col-dokter">dr. Nunki, Sp.OG</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 13 -->
-            <tr data-kat="nunki">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">13</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a1">L</div>
-                  <div>
-                    <div class="nama-pasien">Ny. Linda</div>
-                    <div class="rm">MR 00525114</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">35 th</td>
-              <td><span class="badge-kat purple">dr. Nunki</span></td>
-              <td class="col-ruang">—</td>
-              <td>
-                <div class="cell-diagnosa">G2 P1 A0 H37-38, TBJ 3.100</div>
-                <div class="cell-tindakan">SC</div>
-              </td>
-              <td class="col-dokter">dr. Nunki, Sp.OG</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 14 -->
-            <tr data-kat="nunki">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">14</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a2">IB</div>
-                  <div>
-                    <div class="nama-pasien">Ny. I Bakhtul</div>
-                    <div class="rm">MR 01468559</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">35 th</td>
-              <td><span class="badge-kat purple">dr. Nunki</span></td>
-              <td class="col-ruang">—</td>
-              <td>
-                <div class="cell-diagnosa">G2 P1 A0 H38 mg, PM KSC 2, TBJ 2.970</div>
-                <div class="cell-tindakan">SC</div>
-              </td>
-              <td class="col-dokter">dr. Nunki, Sp.OG</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- 15 -->
-            <tr data-kat="nunki">
-              <td><input type="checkbox" class="check row-check"></td>
-              <td class="col-no">15</td>
-              <td>
-                <div class="pasien">
-                  <div class="avatar-sm a3">A</div>
-                  <div>
-                    <div class="nama-pasien">Ny. Amanda</div>
-                    <div class="rm">MR 00624442</div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-umur">21 th</td>
-              <td><span class="badge-kat purple">dr. Nunki</span></td>
-              <td class="col-ruang">VK / RB Intan</td>
-              <td>
-                <div class="cell-diagnosa">G1 P0 A0 17-16 mg, PEB Fetal Distress</div>
-                <div class="cell-tindakan">SC, IUD</div>
-              </td>
-              <td class="col-dokter">dr. Nunki, Sp.OG</td>
-              <td>
-                <span class="badge wait status-wait">Menunggu</span>
-                <span class="badge done status-done">Sudah Dicek</span>
-              </td>
-              <td>
-                <button class="btn-edit" title="Edit pasien">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-
-          </tbody>
+          <tbody id="tableBody"><!-- diisi JS --></tbody>
         </table>
       </div>
     </section>
-
   </main>
 </div>
 
-<!-- ============ MODAL EDIT ============ -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<!-- ============ MODAL TAMBAH / EDIT PASIEN ============ -->
+<div class="modal-overlay" id="patientModal">
+  <div class="modal-card" role="dialog" aria-modal="true">
     <div class="modal-head">
-      <h3 id="modalTitle">Edit Data Pasien</h3>
-      <button type="button" class="modal-close" id="modalClose" aria-label="Tutup">&times;</button>
+      <h3 id="patientModalTitle">Tambah Pasien Baru</h3>
+      <button type="button" class="modal-close" data-close="patientModal" aria-label="Tutup">&times;</button>
     </div>
-
-    <form class="modal-form" id="editForm">
+    <form class="modal-form" id="patientForm">
       <div class="form-row">
-        <label>Nama Pasien
-          <input type="text" id="editNama" required>
-        </label>
-        <label>Umur (tahun)
-          <input type="text" id="editUmur">
-        </label>
+        <label>Nama Pasien <input type="text" id="fNama" required placeholder="Tn./Ny./An. ..."></label>
+        <label>Umur (tahun) <input type="text" id="fUmur" placeholder="45"></label>
       </div>
-
       <div class="form-row">
-        <label>No. MR
-          <input type="text" id="editMR">
-        </label>
+        <label>No. MR <input type="text" id="fMR" placeholder="01468418"></label>
         <label>Kategori
-          <select id="editKategori">
-            <option value="bu">Bedah Umum</option>
-            <option value="ba">Bedah Anak</option>
-            <option value="uro">Uro</option>
-            <option value="tht">THT</option>
-            <option value="nunki">dr. Nunki</option>
+          <select id="fKategori">
+            <option value="Bedah Umum">Bedah Umum</option>
+            <option value="Bedah Anak">Bedah Anak</option>
+            <option value="Uro">Uro</option>
+            <option value="THT">THT</option>
+            <option value="dr. Nunki">dr. Nunki</option>
           </select>
         </label>
       </div>
-
       <div class="form-row">
-        <label>Ruang
-          <input type="text" id="editRuang" placeholder="—">
-        </label>
-        <label>Dokter
-          <input type="text" id="editDokter">
-        </label>
+        <label>Ruang <input type="text" id="fRuang" placeholder="15.0 / —"></label>
+        <label>Dokter <input type="text" id="fDokter" placeholder="dr. ..., Sp.B"></label>
       </div>
-
-      <label>Diagnosa
-        <input type="text" id="editDiagnosa">
-      </label>
-
-      <label>Tindakan
-        <input type="text" id="editTindakan">
-      </label>
+      <label>Diagnosa <input type="text" id="fDiagnosa" placeholder="Ulkus Cruris (D)"></label>
+      <label>Tindakan <input type="text" id="fTindakan" placeholder="Debridement"></label>
 
       <div class="modal-actions">
-        <button type="button" class="btn btn-cancel" id="modalCancel">Batal</button>
-        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+        <button type="button" class="btn btn-cancel" data-close="patientModal">Batal</button>
+        <button type="submit" class="btn btn-primary" id="btnSavePatient">Simpan</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Toast notifikasi -->
-<div class="toast" id="toast">Data pasien berhasil diperbarui</div>
+<!-- ============ MODAL KONFIRMASI HAPUS ============ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-card modal-small" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3>Hapus Pasien</h3>
+      <button type="button" class="modal-close" data-close="deleteModal" aria-label="Tutup">&times;</button>
+    </div>
+    <p class="confirm-text">Yakin ingin menghapus data pasien <strong id="deleteName">—</strong>? Tindakan ini tidak bisa dibatalkan.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-cancel" data-close="deleteModal">Batal</button>
+      <button type="button" class="btn btn-danger" id="btnConfirmDelete">Hapus</button>
+    </div>
+  </div>
+</div>
 
-<script>
-  /* ==========================================================
-     A. SIDEBAR TOGGLE (sembunyikan / tampilkan navigasi)
-     ========================================================== */
-  const menuToggle = document.getElementById('menuToggle');
+<!-- ============ MODAL PRINT PREVIEW ============ -->
+<div class="modal-overlay" id="printModal">
+  <div class="print-modal-card">
+    <div class="print-toolbar no-print">
+      <h3>Print Preview — Daftar Pasien</h3>
+      <div class="print-toolbar-actions">
+        <button type="button" class="btn btn-cancel" data-close="printModal">Tutup</button>
+        <button type="button" class="btn btn-primary" id="btnDoPrint">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;">
+            <polyline points="6 9 6 2 18 2 18 9"/>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+          Cetak Sekarang
+        </button>
+      </div>
+    </div>
 
-  // Muat state terakhir
-  if (localStorage.getItem('sidebarHidden') === '1') {
-    document.body.classList.add('sidebar-hidden');
-    menuToggle.setAttribute('aria-label', 'Tampilkan menu');
-  }
+    <div class="print-paper" id="printArea">
+      <div class="print-header">
+        <h1>KLINIK SEHAT</h1>
+        <p>Jl. Kesehatan No. 123, Jakarta &middot; Telp: (021) 1234-5678</p>
+        <hr>
+        <h2>DAFTAR PASIEN OPERASI</h2>
+        <div class="print-meta">
+          <span>Tanggal Cetak: <b id="printDate">—</b></span>
+          <span>Total: <b id="printTotal">0</b> pasien</span>
+        </div>
+      </div>
 
-  menuToggle.addEventListener('click', () => {
-    document.body.classList.toggle('sidebar-hidden');
-    const hidden = document.body.classList.contains('sidebar-hidden');
-    localStorage.setItem('sidebarHidden', hidden ? '1' : '0');
-    menuToggle.setAttribute('aria-label', hidden ? 'Tampilkan menu' : 'Sembunyikan menu');
-  });
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Pasien</th>
+            <th>Umur</th>
+            <th>MR</th>
+            <th>Kategori</th>
+            <th>Ruang</th>
+            <th>Diagnosa</th>
+            <th>Tindakan</th>
+            <th>Dokter</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="printTableBody"></tbody>
+      </table>
 
-  /* ==========================================================
-     B. CHECKLIST PASIEN — progress, statistik, filter
-     ========================================================== */
-  const rowChecks   = document.querySelectorAll('.row-check');
-  const checkAll    = document.getElementById('checkAll');
-  const fill        = document.getElementById('progressFill');
-  const text        = document.getElementById('progressText');
-  const statDone    = document.getElementById('statDone');
-  const statWait    = document.getElementById('statWait');
-  const searchInput = document.getElementById('searchInput');
-  const filterKat   = document.getElementById('filterKat');
-  const filterStat  = document.getElementById('filterStatus');
-  const allRows     = [...document.querySelectorAll('#tableBody tr')];
+      <div class="print-footer">
+        <div class="ttd">
+          <p>Jakarta, <span id="printDate2">—</span></p>
+          <p>Admin Klinik</p>
+          <div class="ttd-space"></div>
+          <p><b>( ......................................... )</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-  function updateProgress() {
-    const total = rowChecks.length;
-    const done  = [...rowChecks].filter(c => c.checked).length;
+<!-- Toast -->
+<div class="toast" id="toast">Data tersimpan</div>
 
-    fill.style.width = (done / total * 100) + '%';
-    text.textContent = `${done} dari ${total} pasien sudah dicek`;
-    statDone.textContent = done;
-    statWait.textContent = total - done;
-
-    checkAll.checked       = done === total && total > 0;
-    checkAll.indeterminate = done > 0 && done < total;
-  }
-
-  function applyFilters() {
-    const q      = searchInput.value.toLowerCase().trim();
-    const kat    = filterKat.value;
-    const status = filterStat.value;
-
-    allRows.forEach(tr => {
-      const matchQ   = !q || tr.textContent.toLowerCase().includes(q);
-      const matchKat = kat === 'all' || tr.dataset.kat === kat;
-      const checked  = tr.querySelector('.row-check').checked;
-      const matchSt  = status === 'all'
-                     || (status === 'done' && checked)
-                     || (status === 'wait' && !checked);
-
-      tr.classList.toggle('filtered-out', !(matchQ && matchKat && matchSt));
-    });
-  }
-
-  rowChecks.forEach(c => c.addEventListener('change', () => {
-    updateProgress();
-    applyFilters();
-  }));
-
-  checkAll.addEventListener('change', () => {
-    rowChecks.forEach(c => c.checked = checkAll.checked);
-    updateProgress();
-    applyFilters();
-  });
-
-  searchInput.addEventListener('input', applyFilters);
-  filterKat.addEventListener('change', applyFilters);
-  filterStat.addEventListener('change', applyFilters);
-
-  /* ==========================================================
-     C. MODAL EDIT PASIEN
-     ========================================================== */
-  const kategoriMap = {
-    bu:    { label: 'Bedah Umum', cls: 'tosca'  },
-    ba:    { label: 'Bedah Anak', cls: 'purple' },
-    uro:   { label: 'Uro',        cls: 'tosca'  },
-    tht:   { label: 'THT',        cls: 'purple' },
-    nunki: { label: 'dr. Nunki',  cls: 'purple' }
-  };
-
-  const modal    = document.getElementById('editModal');
-  const form     = document.getElementById('editForm');
-  let currentRow = null;
-
-  function getRowData(row) {
-    return {
-      nama:     row.querySelector('.nama-pasien').textContent.trim(),
-      mr:       row.querySelector('.rm').textContent.replace(/^MR\s*/, '').trim(),
-      umur:     row.querySelector('.col-umur').textContent.replace(/\s*th$/, '').trim(),
-      kat:      row.dataset.kat,
-      ruang:    row.querySelector('.col-ruang').textContent.trim(),
-      diagnosa: row.querySelector('.cell-diagnosa').textContent.trim(),
-      tindakan: row.querySelector('.cell-tindakan').textContent.trim(),
-      dokter:   row.querySelector('.col-dokter').textContent.trim()
-    };
-  }
-
-  function setRowData(row, data) {
-    row.querySelector('.nama-pasien').textContent = data.nama || '—';
-    row.querySelector('.rm').textContent = 'MR ' + (data.mr || '—');
-    row.querySelector('.col-umur').textContent = data.umur ? data.umur + ' th' : '—';
-    row.dataset.kat = data.kat;
-
-    const info  = kategoriMap[data.kat];
-    const badge = row.querySelector('.badge-kat');
-    badge.textContent = info.label;
-    badge.className   = 'badge-kat ' + info.cls;
-
-    row.querySelector('.col-ruang').textContent    = data.ruang    || '—';
-    row.querySelector('.cell-diagnosa').textContent = data.diagnosa || '—';
-    row.querySelector('.cell-tindakan').textContent = data.tindakan || '—';
-    row.querySelector('.col-dokter').textContent   = data.dokter   || '—';
-  }
-
-  function openModal(row) {
-    currentRow = row;
-    const d = getRowData(row);
-
-    document.getElementById('editNama').value     = d.nama;
-    document.getElementById('editUmur').value     = d.umur;
-    document.getElementById('editMR').value       = d.mr;
-    document.getElementById('editKategori').value = d.kat;
-    document.getElementById('editRuang').value    = d.ruang === '—' ? '' : d.ruang;
-    document.getElementById('editDokter').value   = d.dokter;
-    document.getElementById('editDiagnosa').value = d.diagnosa;
-    document.getElementById('editTindakan').value = d.tindakan;
-
-    modal.classList.add('show');
-    setTimeout(() => document.getElementById('editNama').focus(), 80);
-  }
-
-  function closeModal() {
-    modal.classList.remove('show');
-    currentRow = null;
-  }
-
-  document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.addEventListener('click', () => openModal(btn.closest('tr')));
-  });
-
-  document.getElementById('modalClose').addEventListener('click', closeModal);
-  document.getElementById('modalCancel').addEventListener('click', closeModal);
-
-  modal.addEventListener('click', e => {
-    if (e.target === modal) closeModal();
-  });
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
-  });
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    if (!currentRow) return;
-
-    const data = {
-      nama:     document.getElementById('editNama').value.trim(),
-      umur:     document.getElementById('editUmur').value.trim(),
-      mr:       document.getElementById('editMR').value.trim(),
-      kat:      document.getElementById('editKategori').value,
-      ruang:    document.getElementById('editRuang').value.trim(),
-      dokter:   document.getElementById('editDokter').value.trim(),
-      diagnosa: document.getElementById('editDiagnosa').value.trim(),
-      tindakan: document.getElementById('editTindakan').value.trim()
-    };
-
-    setRowData(currentRow, data);
-    closeModal();
-    applyFilters();
-    showToast('Data pasien berhasil diperbarui');
-  });
-
-  /* ==========================================================
-     D. TOAST
-     ========================================================== */
-  let toastTimer;
-  function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-  }
-
-  /* ==========================================================
-     Inisialisasi
-     ========================================================== */
-  updateProgress();
-  applyFilters();
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
